@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chúc Mừng Sinh Nhật 🎂</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Quicksand:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div id="hearts-layer"></div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+  <div class="balloons" id="balloons"></div>
+
+  <div class="hero-content">
+    <p class="eyebrow">✨ hôm nay là ngày đặc biệt ✨</p>
+    <h1 class="hero-title">Chúc Mừng<br><span id="girlName">Người Ấy</span> Sinh Nhật!</h1>
+    <p class="hero-sub">Chúc em mãi xinh đẹp, mãi vui vẻ và mãi là người anh thương nhất 💕</p>
+
+    <div class="counter-card">
+      <div class="counter-num" id="dayCount">0</div>
+      <div class="counter-label">ngày mình đã ở bên nhau</div>
+    </div>
+
+    <a href="#letter" class="scroll-hint">đọc lời nhắn của anh ↓</a>
+  </div>
+</section>
+
+<!-- ===================== LETTER ===================== -->
+<section class="letter" id="letter">
+  <div class="letter-card">
+    <p class="letter-kicker">gửi em,</p>
+    <p class="letter-body" id="letterBody">
+      Sinh nhật vui vẻ nhé em yêu! Cảm ơn em vì đã luôn ở bên, làm mỗi ngày của anh
+      đều trở nên đáng nhớ hơn. Anh mong mình sẽ còn thật nhiều sinh nhật nữa
+      được đón cùng nhau. Yêu em thật nhiều! 🎉🎂
+    </p>
+    <p class="letter-sign">— thương em, mãi mãi 💌</p>
+  </div>
+</section>
+
+<!-- ===================== CAKE ===================== -->
+<section class="cake-section">
+  <p class="cake-hint" id="cakeHint">chạm vào từng ngọn nến để thổi tắt nhé 🕯️</p>
+  <div class="cake-wrap">
+    <svg class="cake" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg">
+      <!-- plate -->
+      <ellipse cx="160" cy="270" rx="130" ry="14" fill="#FFD1E3"/>
+      <!-- bottom layer -->
+      <rect x="50" y="210" width="220" height="60" rx="14" fill="#FFEAF3"/>
+      <rect x="50" y="210" width="220" height="16" rx="8" fill="#FF9EC4"/>
+      <!-- middle layer -->
+      <rect x="75" y="160" width="170" height="55" rx="14" fill="#E9E1FF"/>
+      <rect x="75" y="160" width="170" height="16" rx="8" fill="#C6B4FF"/>
+      <!-- top layer -->
+      <rect x="100" y="115" width="120" height="50" rx="14" fill="#D8FBF1"/>
+      <rect x="100" y="115" width="120" height="16" rx="8" fill="#8FE9D2"/>
+      <!-- drips -->
+      <circle cx="90" cy="220" r="7" fill="#FF9EC4"/>
+      <circle cx="150" cy="225" r="6" fill="#FF9EC4"/>
+      <circle cx="220" cy="222" r="7" fill="#FF9EC4"/>
+      <circle cx="115" cy="170" r="6" fill="#C6B4FF"/>
+      <circle cx="200" cy="172" r="6" fill="#C6B4FF"/>
+      <!-- candles group -->
+      <g id="candles">
+        <g class="candle" data-i="0" transform="translate(120,60)">
+          <rect x="-4" y="20" width="8" height="35" rx="3" fill="#FF9EC4"/>
+          <g class="flame-wrap">
+            <path class="flame" d="M0,-16 C 8,-4 6,6 0,12 C -6,6 -8,-4 0,-16 Z" fill="#FFC24B"/>
+          </g>
+          <circle class="smoke" cx="0" cy="-16" r="3" opacity="0"/>
+        </g>
+        <g class="candle" data-i="1" transform="translate(160,52)">
+          <rect x="-4" y="20" width="8" height="43" rx="3" fill="#8FE9D2"/>
+          <g class="flame-wrap">
+            <path class="flame" d="M0,-16 C 8,-4 6,6 0,12 C -6,6 -8,-4 0,-16 Z" fill="#FFC24B"/>
+          </g>
+          <circle class="smoke" cx="0" cy="-16" r="3" opacity="0"/>
+        </g>
+        <g class="candle" data-i="2" transform="translate(200,60)">
+          <rect x="-4" y="20" width="8" height="35" rx="3" fill="#C6B4FF"/>
+          <g class="flame-wrap">
+            <path class="flame" d="M0,-16 C 8,-4 6,6 0,12 C -6,6 -8,-4 0,-16 Z" fill="#FFC24B"/>
+          </g>
+          <circle class="smoke" cx="0" cy="-16" r="3" opacity="0"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="wish-reveal" id="wishReveal">
+    <p class="wish-emoji">🎉💗🎈</p>
+    <p class="wish-text">Ước mơ của em chắc chắn sẽ thành hiện thực!<br>Chúc mừng sinh nhật, anh yêu em rất nhiều 🥰</p>
+  </div>
+</section>
+
+<!-- ===================== GALLERY ===================== -->
+<section class="gallery">
+  <h2 class="section-title">Vài khoảnh khắc của tụi mình</h2>
+  <div class="polaroids">
+    <div class="polaroid p1"><div class="ph-placeholder">📷<br><span>thêm ảnh 1</span></div><p>khoảnh khắc #1</p></div>
+    <div class="polaroid p2"><div class="ph-placeholder">📷<br><span>thêm ảnh 2</span></div><p>khoảnh khắc #2</p></div>
+    <div class="polaroid p3"><div class="ph-placeholder">📷<br><span>thêm ảnh 3</span></div><p>khoảnh khắc #3</p></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>made with 💗 by anh — <span id="footerDate"></span></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
