@@ -19,3 +19,8 @@ desktop/mobile riêng và chỉ hiển thị khi ScrollTrigger của section Cak
 Từ mốc 3.2, `CakeScene` điều khiển flicker, tắt lần lượt từng flame, giảm ánh sáng nến và phát khói qua
 `CandleSmoke` một draw call. `cakeEvents` là bridge nhỏ để nút React hiện tại và mic ở 3.3 cùng gọi một
 luồng tương tác, tránh nhân đôi state giữa DOM và Three.js.
+
+`LetterScene` ở mốc 4.1 dựng phong bì pastel, giấy kem có grain procedural, nếp gấp lavender, viền
+vàng và con dấu sao bằng geometry/code. Các node `letter-paper` và `letter-envelope-flap` được giữ
+riêng để mốc 4.2 có thể điều khiển mở thư mà không thay model; scene có placement desktop/mobile,
+ánh sáng riêng và vẫn dùng renderer/canvas chung.

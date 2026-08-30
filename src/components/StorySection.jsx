@@ -41,14 +41,25 @@ export function StorySection({ index, recipient, relationship, section }) {
     )
   }
 
+  const sectionClassName = section.id === 'cake'
+    ? 'story-section cake-story-section'
+    : section.id === 'letter'
+      ? 'story-section letter-story-section'
+      : 'story-section'
+  const cardClassName = section.id === 'cake'
+    ? 'section-card cake-copy-panel'
+    : section.id === 'letter'
+      ? 'section-card letter-copy-panel'
+      : 'section-card'
+
   return (
     <section
-      className={section.id === 'cake' ? 'story-section cake-story-section' : 'story-section'}
+      className={sectionClassName}
       id={section.id}
       data-scene={section.sceneModule}
       tabIndex="-1"
     >
-      <div className={section.id === 'cake' ? 'section-card cake-copy-panel' : 'section-card'}>
+      <div className={cardClassName}>
         <div className="section-heading">
           <span className="section-number">0{index}</span>
           <span className="section-icon" aria-hidden="true">

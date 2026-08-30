@@ -188,7 +188,12 @@ AGENTS.md / PLANNING.md / DESCRIPTION.md
 
 ### Phase 4 — Lá thư tay
 
-- [ ] 4.1 Dựng phong bì, giấy và chất liệu 3D phù hợp art direction.
+- [x] 4.1 Dựng phong bì, giấy và chất liệu 3D phù hợp art direction.
+  - [x] `LetterScene` procedural gồm thân phong bì hồng, nếp gấp lavender, giấy kem, viền vàng và con dấu sao; không dùng texture/asset bên ngoài.
+  - [x] Chất liệu giấy dùng grain sinh bằng code, kết hợp roughness cao; bộ key/fill/rim light giữ palette hồng–lavender–vàng kem.
+  - [x] Tách sẵn node giấy và nắp phong bì cho animation ở 4.2; có placement desktop/tablet/mobile và chỉ hiện khi section Letter active.
+  - [x] Scene dùng renderer/canvas chung, có lifecycle đầy đủ và script `verify:phase4.1`.
+  - [x] Edge headless 1440×900 Full đạt **51 FPS**; kiểm tra trực quan xác nhận card trái và model phải không che nhau.
 - [ ] 4.2 Animation mở phong bì theo scroll, có thao tác tap/click để demo trực tiếp.
 - [ ] 4.3 Nạp placeholder khoảng 10 câu từ config, kiểm thử nhiều độ dài nội dung.
 - [ ] 4.4 Dựng typing/handwriting effect và phiên bản tức thời cho `prefers-reduced-motion`.

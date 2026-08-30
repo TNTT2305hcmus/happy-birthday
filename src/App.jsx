@@ -30,6 +30,7 @@ function App() {
     let heroTimeline = null
     let heroScrollTrigger = null
     let cakeScrollTrigger = null
+    let letterScrollTrigger = null
     let isCancelled = false
 
     async function startWebGL() {
@@ -43,6 +44,7 @@ function App() {
           { SceneManager },
           { HeroScene },
           { CakeScene },
+          { LetterScene },
           { gsap },
           { ScrollTrigger },
         ] = await Promise.all([
@@ -50,6 +52,7 @@ function App() {
           import('./core/SceneManager.js'),
           import('./scenes/HeroScene.js'),
           import('./scenes/CakeScene.js'),
+          import('./scenes/LetterScene.js'),
           import('gsap'),
           import('gsap/ScrollTrigger'),
         ])
@@ -65,8 +68,10 @@ function App() {
         })
         const heroScene = new HeroScene()
         const cakeScene = new CakeScene()
+        const letterScene = new LetterScene()
         sceneManager.addSceneModule(heroScene)
         sceneManager.addSceneModule(cakeScene)
+        sceneManager.addSceneModule(letterScene)
 
         const heroSection = document.getElementById('hero')
         heroScene.setActive(Boolean(heroSection))
@@ -130,7 +135,7 @@ function App() {
               cakeScene.setActive(isActive)
               if (isActive) {
                 heroScene.setActive(false)
-              } else if (heroScrollTrigger) {
+              } else if (heroScrollTrigger && !letterScrollTrigger?.isActive) {
                 heroScene.setActive(heroScrollTrigger.isActive)
               }
             },
@@ -141,6 +146,36 @@ function App() {
           cakeScene.setActive(cakeScrollTrigger.isActive)
           cakeScene.setScrollProgress(cakeScrollTrigger.progress)
           if (cakeScrollTrigger.isActive) heroScene.setActive(false)
+        }
+
+        const letterSection = document.getElementById('letter')
+        letterScene.setActive(false)
+
+        if (letterSection) {
+          gsap.registerPlugin(ScrollTrigger)
+          letterScrollTrigger = ScrollTrigger.create({
+            end: 'bottom top',
+            onToggle: ({ isActive }) => {
+              letterScene.setActive(isActive)
+              if (isActive) {
+                heroScene.setActive(false)
+                cakeScene.setActive(false)
+              } else if (cakeScrollTrigger?.isActive) {
+                cakeScene.setActive(true)
+              } else if (heroScrollTrigger?.isActive) {
+                heroScene.setActive(true)
+              }
+            },
+            onUpdate: ({ progress }) => letterScene.setScrollProgress(progress),
+            start: 'top 55%',
+            trigger: letterSection,
+          })
+          letterScene.setActive(letterScrollTrigger.isActive)
+          letterScene.setScrollProgress(letterScrollTrigger.progress)
+          if (letterScrollTrigger.isActive) {
+            heroScene.setActive(false)
+            cakeScene.setActive(false)
+          }
         }
 
         const performanceMonitor = new PerformanceMonitor({
@@ -170,6 +205,7 @@ function App() {
       isCancelled = true
       heroScrollTrigger?.kill()
       cakeScrollTrigger?.kill()
+      letterScrollTrigger?.kill()
       heroTimeline?.kill()
       sceneManager?.dispose()
       clearRuntimeAttributes()
