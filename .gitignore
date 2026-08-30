@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.vite/
+*.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Private reference material — never commit or deploy.
+ref_private_img/
+ref_mascot_background/
+
+# Generated desktop WebGL feedback is reviewed locally, not committed.
+cake-*-desktop.png
+fps-full.png
+fps-lite.png
