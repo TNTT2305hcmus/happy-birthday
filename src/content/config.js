@@ -166,6 +166,16 @@ export const birthdayContent = {
       eyebrow: 'Section 3 · A letter for you',
       title: 'Những điều muốn gửi đến em',
       description: 'Placeholder đủ dài để ước lượng phong bì, giấy viết và nhịp typing animation.',
+      letterCopy: {
+        closeHint: 'Đóng lại để xem nghi thức thêm một lần nữa',
+        closeLabel: 'Gấp lá thư lại',
+        closedStatus: 'Phong bì đang chờ em mở.',
+        closingStatus: 'Lá thư đang được gấp lại…',
+        openHint: 'Có một điều dịu dàng đang chờ bên trong',
+        openLabel: 'Mở lá thư',
+        openStatus: 'Lá thư đã mở. Mình cùng đọc nhé ✦',
+        openingStatus: 'Con dấu phép thuật đang mở…',
+      },
       placeholderSentences: [
         'Chúc em một sinh nhật thật dịu dàng và rực rỡ.',
         'Cảm ơn em đã bước vào cuộc sống của anh theo cách đặc biệt nhất.',

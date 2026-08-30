@@ -24,3 +24,7 @@ luồng tương tác, tránh nhân đôi state giữa DOM và Three.js.
 vàng và con dấu sao bằng geometry/code. Các node `letter-paper` và `letter-envelope-flap` được giữ
 riêng để mốc 4.2 có thể điều khiển mở thư mà không thay model; scene có placement desktop/mobile,
 ánh sáng riêng và vẫn dùng renderer/canvas chung.
+
+Từ mốc 4.2, `LetterScene` ánh xạ progress ScrollTrigger thành chuỗi nhả con dấu, lật nắp quanh
+`letter-flap-hinge` và kéo `letter-paper-group` lên khỏi túi phong bì. `letterEvents` nối cùng state
+này với `LetterControls`, nên nút click/tap có thể mở/đóng để demo độc lập và vẫn hỗ trợ ARIA.

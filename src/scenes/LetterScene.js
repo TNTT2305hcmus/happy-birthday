@@ -15,6 +15,16 @@ import {
   SRGBColorSpace,
   UnsignedByteType,
 } from 'three'
+import {
+  announceLetterState,
+  LETTER_TOGGLE_REQUEST_EVENT,
+} from './letterEvents.js'
+
+const clamp = (value, min = 0, max = 1) => Math.max(min, Math.min(max, value))
+const smoothstep = (value) => {
+  const progress = clamp(value)
+  return progress * progress * (3 - 2 * progress)
+}
 
 function roundedRectangle(width, height, radius) {
   const shape = new Shape()
@@ -87,7 +97,7 @@ function extrude(shape, material, depth = 0.055) {
 function materialPalette(texture) {
   return {
     back: new MeshStandardMaterial({ color: 0xeaa0c5, roughness: 0.66, metalness: 0.02 }),
-    front: new MeshStandardMaterial({ color: 0xf5b8d5, roughness: 0.6, metalness: 0.02 }),
+    front: new MeshStandardMaterial({ color: 0xf5b8d5, roughness: 0.6, metalness: 0.02, side: DoubleSide }),
     fold: new MeshStandardMaterial({ color: 0xdca5e9, roughness: 0.62, metalness: 0.02 }),
     gold: new MeshStandardMaterial({ color: 0xffd98a, emissive: 0x7d4218, emissiveIntensity: 0.14, metalness: 0.42, roughness: 0.3 }),
     ink: new MeshBasicMaterial({ color: 0xb58aa8, transparent: true, opacity: 0.34 }),
@@ -105,6 +115,12 @@ export class LetterScene {
     this.letterModel.name = 'birthday-letter-model'
     this.envelope = new Group()
     this.envelope.name = 'letter-envelope'
+    this.paperGroup = new Group()
+    this.paperGroup.name = 'letter-paper-group'
+    this.flapHinge = new Group()
+    this.flapHinge.name = 'letter-flap-hinge'
+    this.sealGroup = new Group()
+    this.sealGroup.name = 'letter-seal-group'
     this.letterPaper = null
     this.envelopeFlap = null
     this.paperTexture = null
@@ -112,6 +128,10 @@ export class LetterScene {
     this.isActive = false
     this.scrollProgress = 0
     this.scrollTarget = 0
+    this.openProgress = 0
+    this.manualOpenTarget = null
+    this.lastAnnouncedStatus = null
+    this.handleToggleRequest = this.handleToggleRequest.bind(this)
   }
 
   mount(context) {
@@ -132,25 +152,26 @@ export class LetterScene {
     this.letterPaper = extrude(roundedRectangle(2.92, 2.3, 0.1), this.materials.paper, 0.035)
     this.letterPaper.name = 'letter-paper'
     this.letterPaper.position.set(0, 0.72, 0.015)
-    this.envelope.add(this.letterPaper)
+    this.paperGroup.add(this.letterPaper)
 
     const border = extrude(roundedRectangle(2.68, 2.05, 0.075), this.materials.gold, 0.012)
     border.name = 'letter-paper-gold-border'
     border.position.set(0, 0.72, 0.058)
     border.scale.z = 0.4
-    this.envelope.add(border)
+    this.paperGroup.add(border)
 
     const writingSurface = extrude(roundedRectangle(2.61, 1.98, 0.06), this.materials.paper, 0.012)
     writingSurface.name = 'letter-paper-writing-surface'
     writingSurface.position.set(0, 0.72, 0.074)
-    this.envelope.add(writingSurface)
+    this.paperGroup.add(writingSurface)
 
     for (let index = 0; index < 5; index += 1) {
       const line = new Mesh(new BoxGeometry(1.88 - index * 0.08, 0.018, 0.012), this.materials.ink)
       line.name = `letter-writing-guide-${index + 1}`
       line.position.set(-0.18 + index * 0.025, 1.18 - index * 0.25, 0.1)
-      this.envelope.add(line)
+      this.paperGroup.add(line)
     }
+    this.envelope.add(this.paperGroup)
 
     const pocket = extrude(polygon([
       [-1.75, -1.04], [1.75, -1.04], [1.75, 0.7], [0, -0.18], [-1.75, 0.7],
@@ -169,8 +190,10 @@ export class LetterScene {
 
     this.envelopeFlap = extrude(polygon([[-1.68, 0.98], [1.68, 0.98], [0, -0.18]]), this.materials.front, 0.055)
     this.envelopeFlap.name = 'letter-envelope-flap'
-    this.envelopeFlap.position.z = 0.28
-    this.envelope.add(this.envelopeFlap)
+    this.envelopeFlap.position.set(0, -0.98, 0)
+    this.flapHinge.position.set(0, 0.98, 0.28)
+    this.flapHinge.add(this.envelopeFlap)
+    this.envelope.add(this.flapHinge)
 
     const seal = extrude(star(6, 0.25, 0.14), this.materials.wax, 0.075)
     seal.name = 'letter-wax-star-seal'
@@ -179,7 +202,8 @@ export class LetterScene {
     const sealSpark = extrude(star(5, 0.1, 0.045), this.materials.gold, 0.03)
     sealSpark.name = 'letter-seal-gold-star'
     sealSpark.position.set(0, -0.13, 0.46)
-    this.envelope.add(seal, sealSpark)
+    this.sealGroup.add(seal, sealSpark)
+    this.envelope.add(this.sealGroup)
 
     this.letterModel.add(this.envelope)
     this.group.add(this.letterModel)
@@ -199,16 +223,68 @@ export class LetterScene {
 
     context.scene.add(this.group)
     this.group.visible = this.isActive
+    this.applyOpenPose(0)
     this.resize()
+    if (typeof window !== 'undefined') {
+      window.addEventListener(LETTER_TOGGLE_REQUEST_EVENT, this.handleToggleRequest)
+    }
   }
 
   setActive(isActive) {
     this.isActive = Boolean(isActive)
     this.group.visible = this.isActive
+    if (!this.isActive) this.manualOpenTarget = null
+    else this.announceState('scroll')
   }
 
   setScrollProgress(progress) {
-    this.scrollTarget = Math.max(0, Math.min(1, progress))
+    const nextProgress = clamp(progress)
+    if (Math.abs(nextProgress - this.scrollTarget) > 0.002) this.manualOpenTarget = null
+    this.scrollTarget = nextProgress
+  }
+
+  getScrollOpenTarget() {
+    return smoothstep((this.scrollTarget - 0.08) / 0.58)
+  }
+
+  setOpen(isOpen, source = 'control') {
+    this.manualOpenTarget = isOpen ? 1 : 0
+    this.announceState(source, isOpen ? 'opening' : 'closing')
+  }
+
+  handleToggleRequest({ detail }) {
+    if (!this.isActive || typeof detail?.isOpen !== 'boolean') return
+    this.setOpen(detail.isOpen, 'control')
+  }
+
+  applyOpenPose(progress) {
+    const flapProgress = smoothstep(progress / 0.56)
+    const paperProgress = smoothstep((progress - 0.34) / 0.66)
+    const sealProgress = smoothstep(progress / 0.24)
+    this.flapHinge.rotation.x = -Math.PI * flapProgress
+    this.paperGroup.position.set(0, 0.68 * paperProgress, 0.12 * paperProgress)
+    this.paperGroup.scale.setScalar(1 + 0.025 * paperProgress)
+    this.sealGroup.scale.setScalar(1 - sealProgress)
+    this.sealGroup.rotation.z = -0.18 * sealProgress
+  }
+
+  announceState(source = 'scroll', forcedStatus = null) {
+    const target = this.manualOpenTarget ?? this.getScrollOpenTarget()
+    const status = forcedStatus ?? (
+      this.openProgress <= 0.02 && target <= 0.02
+        ? 'closed'
+        : this.openProgress >= 0.98 && target >= 0.98
+          ? 'open'
+          : target >= this.openProgress ? 'opening' : 'closing'
+    )
+    if (!forcedStatus && status === this.lastAnnouncedStatus) return
+    this.lastAnnouncedStatus = status
+    announceLetterState({
+      isOpen: target >= 0.5,
+      progress: this.openProgress,
+      source,
+      status,
+    })
   }
 
   resize({ height = 900, width = 1_440 } = {}) {
@@ -220,10 +296,10 @@ export class LetterScene {
       this.group.position.set(1.28, -0.12, 0.1)
       this.group.scale.setScalar(0.72)
     } else if (height <= 980) {
-      this.group.position.set(1.62, -0.08, 0)
+      this.group.position.set(1.62, -0.25, 0)
       this.group.scale.setScalar(0.74)
     } else {
-      this.group.position.set(1.58, -0.03, 0)
+      this.group.position.set(1.58, -0.18, 0)
       this.group.scale.setScalar(0.82)
     }
   }
@@ -235,6 +311,12 @@ export class LetterScene {
     this.elapsedSeconds += delta
     const smoothing = 1 - Math.exp(-delta * 4.5)
     this.scrollProgress += (this.scrollTarget - this.scrollProgress) * smoothing
+    const openTarget = this.manualOpenTarget ?? this.getScrollOpenTarget()
+    const openSmoothing = reducedMotion ? 1 : 1 - Math.exp(-delta * 5.8)
+    this.openProgress += (openTarget - this.openProgress) * openSmoothing
+    if (Math.abs(openTarget - this.openProgress) < 0.001) this.openProgress = openTarget
+    this.applyOpenPose(this.openProgress)
+    this.announceState(this.manualOpenTarget === null ? 'scroll' : 'control')
     if (reducedMotion) {
       this.letterModel.rotation.set(-0.025, -0.06, -0.025)
       return
@@ -247,6 +329,9 @@ export class LetterScene {
 
   dispose() {
     this.group.parent?.remove(this.group)
+    if (typeof window !== 'undefined') {
+      window.removeEventListener(LETTER_TOGGLE_REQUEST_EVENT, this.handleToggleRequest)
+    }
     const geometries = new Set()
     const materials = new Set()
     this.group.traverse((object) => {
@@ -260,6 +345,9 @@ export class LetterScene {
     this.group.clear()
     this.letterPaper = null
     this.envelopeFlap = null
+    this.paperGroup = null
+    this.flapHinge = null
+    this.sealGroup = null
     this.paperTexture = null
   }
 }

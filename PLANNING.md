@@ -194,7 +194,12 @@ AGENTS.md / PLANNING.md / DESCRIPTION.md
   - [x] Tách sẵn node giấy và nắp phong bì cho animation ở 4.2; có placement desktop/tablet/mobile và chỉ hiện khi section Letter active.
   - [x] Scene dùng renderer/canvas chung, có lifecycle đầy đủ và script `verify:phase4.1`.
   - [x] Edge headless 1440×900 Full đạt **51 FPS**; kiểm tra trực quan xác nhận card trái và model phải không che nhau.
-- [ ] 4.2 Animation mở phong bì theo scroll, có thao tác tap/click để demo trực tiếp.
+- [x] 4.2 Animation mở phong bì theo scroll, có thao tác tap/click để demo trực tiếp.
+  - [x] Scroll progress điều khiển tuần tự con dấu thu nhỏ, nắp lật quanh bản lề và giấy trượt lên; khi cuộn tiếp sau thao tác tay, scroll giành lại quyền điều khiển.
+  - [x] Nút mở/đóng hỗ trợ click, tap, keyboard, `aria-expanded` và thông báo `aria-live`; WebGL fallback vẫn giữ điều khiển DOM hoạt động.
+  - [x] `prefers-reduced-motion` chuyển ngay giữa trạng thái đóng/mở, không chạy nội suy dài.
+  - [x] Event bridge dùng chung một state animation cho ScrollTrigger và điều khiển trực tiếp, tránh nhân đôi logic giữa React và Three.js.
+  - [x] Edge headless click thật xác nhận `aria-expanded` và scene state chuyển tới `open`; Full 1440×900 đạt **50 FPS**.
 - [ ] 4.3 Nạp placeholder khoảng 10 câu từ config, kiểm thử nhiều độ dài nội dung.
 - [ ] 4.4 Dựng typing/handwriting effect và phiên bản tức thời cho `prefers-reduced-motion`.
 - [ ] 4.5 Hoàn thiện bố cục desktop/mobile, contrast, scrolling nội dung dài và đo FPS.

@@ -1,9 +1,10 @@
 import { HeroOverlay } from './HeroOverlay.jsx'
 import { CakeControls } from './CakeControls.jsx'
+import { LetterControls } from './LetterControls.jsx'
 
 function LetterPreview({ sentences }) {
   return (
-    <div className="letter-preview">
+    <div className="letter-preview" id="letter-preview-content">
       {sentences.slice(0, 3).map((sentence) => (
         <p key={sentence}>{sentence}</p>
       ))}
@@ -71,6 +72,7 @@ export function StorySection({ index, recipient, relationship, section }) {
         <h1>{section.title.replace('{recipient}', recipient.displayName)}</h1>
         <p className="section-description">{section.description}</p>
 
+        {section.id === 'letter' && <LetterControls copy={section.letterCopy} />}
         {section.id === 'letter' && <LetterPreview sentences={section.placeholderSentences} />}
         {section.id === 'gallery' && <GalleryPreview itemCount={section.items.length} />}
         {section.id === 'cake' && <CakeControls copy={section.cakeCopy} />}
