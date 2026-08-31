@@ -13,7 +13,7 @@ const [appSource, configSource, controlsSource, eventsSource, planning, storySou
   readFile(new URL('../src/styles/global.css', import.meta.url), 'utf8'),
 ])
 
-assert.ok(appSource.includes('letterScene.setScrollProgress(progress)'))
+assert.ok(appSource.includes('sceneManager.setSectionSnapshot'))
 assert.ok(configSource.includes('letterCopy:'))
 assert.ok(controlsSource.includes('aria-expanded={isOpen}'))
 assert.ok(controlsSource.includes('requestLetterToggle(nextOpen)'))

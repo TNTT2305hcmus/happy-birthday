@@ -254,18 +254,18 @@ khi R7 đạt. Các Phase 1–4 đã hoàn thành được giữ làm baseline r
 
 #### Phase R1 — Section Manager và sân khấu một khung hình
 
-- [ ] R1.1 Tách xác định active section khỏi App.jsx thành một SectionManager/context có một nguồn trạng thái
+- [x] R1.1 Tách xác định active section khỏi App.jsx thành một SectionManager/context có một nguồn trạng thái
   duy nhất cho Intro, Hero, Cake và Letter.
-- [ ] R1.2 Chuẩn hóa ngưỡng enter/active/leave và chiều cuộn cho từng section; chỉ cho phép active section cùng
+- [x] R1.2 Chuẩn hóa ngưỡng enter/active/leave và chiều cuộn cho từng section; chỉ cho phép active section cùng
   tối đa một section liền kề tồn tại trong khoảng transition.
-- [ ] R1.3 Sau transition, section không active phải dùng visibility hidden, pointer-events none và trạng thái
+- [x] R1.3 Sau transition, section không active phải dùng visibility hidden, pointer-events none và trạng thái
   accessibility phù hợp; focus không được nằm lại trong section đã ẩn.
-- [ ] R1.4 Nối SectionManager với SceneManager để chỉ scene 3D cần thiết được visible/update; loại bỏ logic
+- [x] R1.4 Nối SectionManager với SceneManager để chỉ scene 3D cần thiết được visible/update; loại bỏ logic
   Hero/Cake/Letter tự bật tắt lẫn nhau rải rác trong App.jsx.
-- [ ] R1.5 Dựng crossfade + dịch chuyển nhẹ giữa section, đồng bộ DOM và camera/scene progress; reduced motion
+- [x] R1.5 Dựng crossfade + dịch chuyển nhẹ giữa section, đồng bộ DOM và camera/scene progress; reduced motion
   dùng cut/fade ngắn.
-- [ ] R1.6 Giữ demo trực tiếp qua query section, WebGL fallback và refresh giữa hành trình hoạt động độc lập.
-- [ ] R1.7 Kiểm thử cuộn lên/xuống nhanh, wheel/touch/keyboard, resize giữa transition và lịch sử focus.
+- [x] R1.6 Giữ demo trực tiếp qua query section, WebGL fallback và refresh giữa hành trình hoạt động độc lập.
+- [x] R1.7 Kiểm thử cuộn lên/xuống nhanh, wheel/touch/keyboard, resize giữa transition và lịch sử focus.
 
 **Gate R1:** ngoài transition chỉ thấy và tương tác đúng một section; không có hai mascot/scene chồng nhau,
 không click xuyên section ẩn, không giật do nhiều scene cùng update.

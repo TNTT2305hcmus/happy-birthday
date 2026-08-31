@@ -10,7 +10,8 @@ const [appSource, sceneReadme, stylesheet] = await Promise.all([
 ])
 
 assert.ok(appSource.includes("import('./scenes/CakeScene.js')"), 'CakeScene must be loaded by App')
-assert.ok(appSource.includes('cakeScrollTrigger = ScrollTrigger.create'), 'Cake needs a ScrollTrigger')
+assert.ok(appSource.includes(`sectionId: 'cake'`), 'Cake needs SectionManager registration')
+assert.ok(appSource.includes('connectScrollTrigger'), 'Cake needs centralized ScrollTrigger orchestration')
 assert.ok(stylesheet.includes('.cake-copy-panel'), 'Cake overlay layout is missing')
 assert.ok(sceneReadme.includes('`CakeScene`'), 'CakeScene documentation is missing')
 

@@ -9,7 +9,8 @@ const [appSource, sceneReadme, stylesheet] = await Promise.all([
   readFile(new URL('../src/styles/global.css', import.meta.url), 'utf8'),
 ])
 assert.ok(appSource.includes("import('./scenes/LetterScene.js')"))
-assert.ok(appSource.includes('letterScrollTrigger = ScrollTrigger.create'))
+assert.ok(appSource.includes(`sectionId: 'letter'`))
+assert.ok(appSource.includes('connectScrollTrigger'))
 assert.ok(stylesheet.includes('.letter-copy-panel'))
 assert.ok(sceneReadme.includes('`LetterScene`'))
 

@@ -257,6 +257,34 @@ html[data-quality='lite'] .lite-notice {
   padding: 7rem 1.25rem 4rem;
 }
 
+.story-section[data-section-state] {
+  opacity: var(--section-presence, 0);
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate3d(0, 1.25rem, 0);
+  transition:
+    opacity 180ms linear,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear;
+  will-change: opacity, transform;
+}
+
+.story-section[data-section-state='active'],
+.story-section[data-section-state='entering'],
+.story-section[data-section-state='leaving'] {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.story-section[data-section-state='active'] {
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
+}
+
+.story-section[data-section-state='leaving'] {
+  transform: translate3d(0, -1.25rem, 0);
+}
+
 .story-section:focus {
   outline: none;
 }
@@ -2633,6 +2661,11 @@ h1 {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .story-section[data-section-state] {
+    transform: none;
+    transition-duration: 90ms, 0s, 0s;
   }
 
   .hack-scanline,

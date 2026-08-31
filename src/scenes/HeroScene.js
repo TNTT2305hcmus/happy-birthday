@@ -150,6 +150,7 @@ export class HeroScene {
 
   setActive(isActive) {
     this.isActive = Boolean(isActive)
+    this.group.visible = this.isActive
     if (this.mascot) this.mascot.group.visible = this.isActive
     if (this.magicTrail) this.magicTrail.points.visible = this.isActive
   }

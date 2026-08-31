@@ -1,6 +1,7 @@
 import { HeroOverlay } from './HeroOverlay.jsx'
 import { CakeControls } from './CakeControls.jsx'
 import { LetterControls } from './LetterControls.jsx'
+import { useSectionStage } from '../core/SectionManagerContext.js'
 
 function GalleryPreview({ itemCount }) {
   return (
@@ -14,9 +15,12 @@ function GalleryPreview({ itemCount }) {
 }
 
 export function StorySection({ index, recipient, relationship, section }) {
+  const sectionStage = useSectionStage(section.id)
+
   if (section.id === 'hero') {
     return (
       <section
+        data-section-state={sectionStage.state}
         className="story-section hero-story-section"
         id={section.id}
         data-scene={section.sceneModule}
@@ -44,6 +48,7 @@ export function StorySection({ index, recipient, relationship, section }) {
 
   return (
     <section
+      data-section-state={sectionStage.state}
       className={sectionClassName}
       id={section.id}
       data-scene={section.sceneModule}

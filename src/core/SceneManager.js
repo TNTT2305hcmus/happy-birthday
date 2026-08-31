@@ -29,7 +29,9 @@ export class SceneManager {
     this.camera = new PerspectiveCamera(45, 1, 0.1, 100)
     this.camera.position.set(0, 0, 5)
     this.frameTasks = new Set()
-    this.sceneModules = new Set()
+    this.sceneModules = new Map()
+    this.activeSectionIds = new Set()
+    this.sectionProgress = {}
     this.animationFrameId = null
     this.lastFrameTime = null
     this.isRunning = false
@@ -61,7 +63,7 @@ export class SceneManager {
     return () => this.frameTasks.delete(task)
   }
 
-  addSceneModule(sceneModule) {
+  addSceneModule(sceneModule, { sectionId = null } = {}) {
     if (!sceneModule || typeof sceneModule.mount !== 'function') {
       throw new TypeError('Scene modules must provide a mount(context) method.')
     }
@@ -75,7 +77,11 @@ export class SceneManager {
     }
 
     sceneModule.mount(context)
-    this.sceneModules.add(sceneModule)
+    this.sceneModules.set(sceneModule, { sectionId })
+    if (sectionId) {
+      sceneModule.setScrollProgress?.(this.sectionProgress[sectionId] ?? 0)
+      sceneModule.setActive?.(this.activeSectionIds.has(sectionId))
+    }
     sceneModule.resize?.({
       height: Math.max(1, window.innerHeight),
       width: Math.max(1, window.innerWidth),
@@ -99,8 +105,18 @@ export class SceneManager {
 
     this.qualityMode = nextMode
     this.canvas.dataset.quality = nextMode
-    this.sceneModules.forEach((sceneModule) => sceneModule.setQualityMode?.(nextMode))
+    this.sceneModules.forEach((_, sceneModule) => sceneModule.setQualityMode?.(nextMode))
     this.handleResize()
+  }
+
+  setSectionSnapshot({ presentSectionIds = [], sectionProgress = {} } = {}) {
+    this.activeSectionIds = new Set(presentSectionIds)
+    this.sectionProgress = sectionProgress
+    this.sceneModules.forEach(({ sectionId }, sceneModule) => {
+      if (!sectionId) return
+      sceneModule.setActive?.(this.activeSectionIds.has(sectionId))
+      sceneModule.setScrollProgress?.(sectionProgress[sectionId] ?? 0)
+    })
   }
 
   handleResize() {
@@ -117,7 +133,7 @@ export class SceneManager {
     this.camera.updateProjectionMatrix()
     this.renderer.setPixelRatio(pixelRatio)
     this.renderer.setSize(width, height, false)
-    this.sceneModules.forEach((sceneModule) => sceneModule.resize?.({ height, width }))
+    this.sceneModules.forEach((_, sceneModule) => sceneModule.resize?.({ height, width }))
   }
 
   handleVisibilityChange() {
@@ -151,7 +167,9 @@ export class SceneManager {
     }
 
     this.frameTasks.forEach((task) => task(frame))
-    this.sceneModules.forEach((sceneModule) => sceneModule.update?.(frame))
+    this.sceneModules.forEach(({ sectionId }, sceneModule) => {
+      if (!sectionId || this.activeSectionIds.has(sectionId)) sceneModule.update?.(frame)
+    })
     this.renderer.render(this.scene, this.camera)
     this.animationFrameId = window.requestAnimationFrame(this.renderFrame)
   }
@@ -184,7 +202,7 @@ export class SceneManager {
     this.pause()
     this.isDisposed = true
     this.frameTasks.clear()
-    this.sceneModules.forEach((sceneModule) => sceneModule.dispose?.())
+    this.sceneModules.forEach((_, sceneModule) => sceneModule.dispose?.())
     this.sceneModules.clear()
     window.removeEventListener('resize', this.handleResize)
     document.removeEventListener('visibilitychange', this.handleVisibilityChange)

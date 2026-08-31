@@ -17,9 +17,13 @@ const LOCKED_KEYS = new Set([
   'Tab',
 ])
 
-export function ExperienceGate({ content, initialStage = 'landing' }) {
+export function ExperienceGate({ content, initialStage = 'landing', onStageChange }) {
   const [stage, setStage] = useState(initialStage)
   const [isActivating, setIsActivating] = useState(false)
+
+  useEffect(() => {
+    onStageChange?.(stage)
+  }, [onStageChange, stage])
 
   const beginTransition = useCallback(() => {
     setStage((currentStage) => currentStage === 'hacker' ? 'transition' : currentStage)
