@@ -200,13 +200,197 @@ AGENTS.md / PLANNING.md / DESCRIPTION.md
   - [x] `prefers-reduced-motion` chuyển ngay giữa trạng thái đóng/mở, không chạy nội suy dài.
   - [x] Event bridge dùng chung một state animation cho ScrollTrigger và điều khiển trực tiếp, tránh nhân đôi logic giữa React và Three.js.
   - [x] Edge headless click thật xác nhận `aria-expanded` và scene state chuyển tới `open`; Full 1440×900 đạt **50 FPS**.
-- [ ] 4.3 Nạp placeholder khoảng 10 câu từ config, kiểm thử nhiều độ dài nội dung.
-- [ ] 4.4 Dựng typing/handwriting effect và phiên bản tức thời cho `prefers-reduced-motion`.
-- [ ] 4.5 Hoàn thiện bố cục desktop/mobile, contrast, scrolling nội dung dài và đo FPS.
+- [x] 4.3 Nạp placeholder khoảng 10 câu từ config, kiểm thử nhiều độ dài nội dung.
+  - [x] Hiển thị đủ 10 câu placeholder từ content/config.js, kèm lời mở đầu, chữ ký và nhãn bản nháp cũng được quản lý bằng config.
+  - [x] Chuẩn hóa dữ liệu câu an toàn, phân loại nội dung ngắn/vừa/dài và giữ vùng đọc cuộn độc lập để nội dung dài không đẩy vỡ card.
+  - [x] Kiểm thử cấu trúc với nội dung 1, 10 và 20 câu; nội dung rỗng có fallback, vùng đọc chỉ nhận focus sau khi phong bì mở.
+- [x] 4.4 Dựng typing/handwriting effect và phiên bản tức thời cho prefers-reduced-motion.
+  - [x] Mỗi câu dùng ink-reveal theo nhịp riêng được tính từ độ dài, giới hạn tổng thời gian khoảng 11 giây và tự chạy lại khi mở thư lần nữa.
+  - [x] Nội dung đầy đủ vẫn có sẵn trong DOM cho công nghệ hỗ trợ; vùng đọc tự trở về đầu khi mở lại.
+  - [x] prefers-reduced-motion bỏ toàn bộ reveal/transition và hiển thị tức thời lời chào, nội dung cùng chữ ký.
+- [x] 4.5 Hoàn thiện bố cục desktop/mobile, contrast, scrolling nội dung dài và đo FPS.
+  - [x] Thêm compact-height riêng cho Letter tại desktop thấp; trạng thái mở nằm trọn các viewport 1470×956, 1470×850 và 1440×900.
+  - [x] Mobile 390×844 không tràn ngang, nút mở thư nằm trong viewport; nội dung dài cuộn độc lập với touch/overscroll và scrollbar rõ ràng.
+  - [x] Màu chữ chính đạt contrast trên 7:1, copy phụ đạt tối thiểu 4.5:1 trên nền giấy sáng.
+  - [x] Edge headless đạt 60 FPS ở cả ba viewport desktop và mobile; reduced-motion xác nhận không chạy handwriting animation.
 
 **Điểm feedback:** duyệt phong bì, font, tốc độ viết và diện tích dành cho thư thật.
 
-### Phase 5 — Gallery ảnh
+### Phase R — Refinement Pass 1: Intro, Hero, Cake, Letter và điều phối section
+
+**Nguồn yêu cầu:** REFINEMENT-PLAN.md.
+
+**Trạng thái và thứ tự:** Phase R là gate bắt buộc sau Phase 4 và trước Phase 5. Thực hiện tuần tự
+R0 → R1 → R2 → R3 → R4 → R5 → R6 → R7; không bắt đầu Gallery, Outro, âm thanh hoặc bàn giao cho tới
+khi R7 đạt. Các Phase 1–4 đã hoàn thành được giữ làm baseline regression, không sửa lại checklist lịch sử.
+
+**Quy tắc khi refinement xung đột với baseline:**
+
+- Vẫn chỉ có một renderer/canvas Three.js và một nguồn trạng thái section; không giải quyết chồng lấn bằng
+  cách tạo thêm renderer hoặc timeline độc lập.
+- Nút “thổi bằng nút” có thể bỏ khỏi UI chính, nhưng click/tap vào ngọn nến phải trở thành fallback thủ công
+  đầy đủ; WebGL fallback và keyboard vẫn cần một điều khiển tương đương khi không thể hit-test ngọn nến.
+- Auto-scroll Cake → Hero chỉ chạy trong nghi thức gửi điều ước, có thể bị người dùng ngắt bằng wheel/touch/
+  keyboard; reduced motion dùng chuyển trạng thái ngắn, không ép camera chạy ngược một quãng dài.
+- Mascot phụ và “twinkle” trang trí phải là thiết kế nguyên bản theo hệ hình hiện tại, không sao chép mascot
+  Twinkle hoặc nhân vật Disney từ ảnh tham khảo.
+- Nội dung cá nhân mới tiếp tục đi qua content/config.js. Nội dung trong REFINEMENT-PLAN.md được xem là bản
+  copy đã yêu cầu cho prototype refinement, nhưng vẫn cần duyệt lại trước Phase 7.
+
+#### Phase R0 — Đóng băng baseline và lập bản đồ regression
+
+- [x] R0.1 Chụp lại trạng thái kỹ thuật của Intro/Hero/Cake/Letter: trigger, scene active, DOM overlay, fallback,
+  reduced motion, Lite Mode và các script verify đang có.
+- [x] R0.2 Lập ma trận ánh xạ từng yêu cầu REFINEMENT-PLAN 1.0–1.5 sang R1–R7; ghi rõ file/module dự kiến sửa.
+- [x] R0.3 Bổ sung bộ smoke test full journey Intro → Hero → Cake → Letter để phát hiện section/mascot chồng lấn
+  trước khi thay kiến trúc.
+- [x] R0.4 Chốt baseline viewport 1470×956, 1470×850, 1440×900 và 390×844; lưu số FPS và lỗi console ban đầu.
+  - [x] Full journey 1470×850: Intro lock đạt, hoàn tất sau 14.827 ms; Hero/Cake/Letter đều 60 FPS.
+  - [x] Browser matrix đạt 59–61 FPS, không tràn ngang, không runtime exception; ghi nhận favicon.ico 404
+    không chặn và overlap DOM tại ranh giới section làm baseline cho R1.
+  - [x] Lint, production build, verify:refinement-r0 và toàn bộ regression Phase 1–4 đạt.
+
+**Gate R0:** chưa thay đổi UI; lint, build và regression Phase 1–4 vẫn đạt, có báo cáo baseline để so sánh.
+
+#### Phase R1 — Section Manager và sân khấu một khung hình
+
+- [ ] R1.1 Tách xác định active section khỏi App.jsx thành một SectionManager/context có một nguồn trạng thái
+  duy nhất cho Intro, Hero, Cake và Letter.
+- [ ] R1.2 Chuẩn hóa ngưỡng enter/active/leave và chiều cuộn cho từng section; chỉ cho phép active section cùng
+  tối đa một section liền kề tồn tại trong khoảng transition.
+- [ ] R1.3 Sau transition, section không active phải dùng visibility hidden, pointer-events none và trạng thái
+  accessibility phù hợp; focus không được nằm lại trong section đã ẩn.
+- [ ] R1.4 Nối SectionManager với SceneManager để chỉ scene 3D cần thiết được visible/update; loại bỏ logic
+  Hero/Cake/Letter tự bật tắt lẫn nhau rải rác trong App.jsx.
+- [ ] R1.5 Dựng crossfade + dịch chuyển nhẹ giữa section, đồng bộ DOM và camera/scene progress; reduced motion
+  dùng cut/fade ngắn.
+- [ ] R1.6 Giữ demo trực tiếp qua query section, WebGL fallback và refresh giữa hành trình hoạt động độc lập.
+- [ ] R1.7 Kiểm thử cuộn lên/xuống nhanh, wheel/touch/keyboard, resize giữa transition và lịch sử focus.
+
+**Gate R1:** ngoài transition chỉ thấy và tương tác đúng một section; không có hai mascot/scene chồng nhau,
+không click xuyên section ẩn, không giật do nhiều scene cùng update.
+
+#### Phase R2 — Refinement Intro và chuyển cảnh sang Hero
+
+- [ ] R2.1 Giữ nguyên terminal, Matrix rain, lock input 10 giây và trạng thái hoàn tất hiện tại.
+- [ ] R2.2 Gỡ shatter/fragments, star burst và confetti khỏi chuyển cảnh Intro.
+- [ ] R2.3 Dựng timeline mới: đạt 100% → giữ 3 giây → tối dần tới đen trong 3 giây → sáng dần vào Hero trong
+  2 giây.
+- [ ] R2.4 Bàn giao active section cho SectionManager tại màn đen, bảo đảm Intro không xuất hiện lại hoặc nhận
+  pointer/focus sau khi Hero sáng hoàn toàn.
+- [ ] R2.5 Thêm watchdog/fallback cho lỗi animation và phiên bản reduced motion vẫn giữ đúng thứ tự trạng thái.
+- [ ] R2.6 Kiểm thử timing bằng clock, refresh, tab background/foreground và entry mặc định lẫn stage landing.
+
+**Gate R2:** không còn hiệu ứng nứt vỡ/confetti; timing 3s giữ → 3s tối → 2s sáng đạt sai số kiểm thử cho phép,
+kết thúc ở Hero duy nhất.
+
+#### Phase R3 — Hero redesign
+
+- [ ] R3.1 Chuyển toàn bộ copy Hero mới vào config: tag ngày, tiêu đề script “Happy Birthday Ngiu Hiền Lương
+  xinh đẹp của a” và dòng thời gian/only-you; xác nhận UTF-8 và glyph tiếng Việt, đặc biệt chữ “Hiền”.
+- [ ] R3.2 Thu gọn card chính và chỉ giữ ba nhóm nội dung đã duyệt; bỏ ba stat block và bỏ CTA bắt đầu hành trình.
+- [ ] R3.3 Dựng typography script/bay bổng, line wrapping và contrast cho desktop/mobile/fallback.
+- [ ] R3.4 Tạo loop reveal/marquee chậm cùng gradient cho cụm “I love u… only you”; reduced motion hiển thị tĩnh.
+- [ ] R3.5 Giữ pose/model mascot chính, sửa ngôi sao trên mũ thẳng tâm với chóp mũ ở mọi animation/scale.
+- [ ] R3.6 Thêm mascot tiên nhỏ ở góc trên phải và 2–3 star companion nguyên bản ở đáy card; hướng bố cục hội
+  tụ vào nội dung, có budget geometry/particle rõ ràng.
+- [ ] R3.7 Cân lại responsive placement, pointer parallax, fallback 2D, Lite Mode và vùng an toàn 1470×850.
+- [ ] R3.8 Kiểm thử screenshot/DOM text UTF-8, không còn stat/CTA cũ, không tràn ngang và đo FPS Full/Lite.
+
+**Gate R3:** copy đủ dấu, card đúng ba nhóm nội dung, các trang trí không che chữ, sao trên mũ đúng trục và
+Hero đạt tối thiểu 30 FPS.
+
+#### Phase R4 — Cake layout, trigger và tương tác nến
+
+- [ ] R4.1 Đảo bố cục Cake: bánh bên trái, card điều ước bên phải; cập nhật camera/placement cho desktop,
+  compact-height, mobile và fallback.
+- [ ] R4.2 Chuyển ngưỡng active/reveal sang SectionManager để bánh chỉ xuất hiện khi Cake vào đủ khoảng 60–80%,
+  không ló sớm từ Hero.
+- [ ] R4.3 Sửa topper/ngôi sao chính thẳng tâm với tầng bánh trên cùng và công bố world anchor ổn định cho R5.
+- [ ] R4.4 Rút card còn tiêu đề, ô điều ước + nút gửi và nút microphone; copy/trạng thái lỗi vẫn lấy từ config.
+- [ ] R4.5 Gỡ nút thổi thủ công khỏi UI chính; thêm raycast hit-area cho từng ngọn lửa để click/tap tắt từng nến,
+  hỗ trợ debounce và trạng thái nến đã tắt.
+- [ ] R4.6 Tạo keyboard/WebGL fallback tương đương cho tương tác từng nến; mic denied/timeout/unsupported không
+  được chặn hoàn thành nghi thức.
+- [ ] R4.7 Gỡ CelebrationConfetti và CakeFairyCelebration khỏi bundle/lifecycle Cake; giữ reset demo không rò rỉ
+  event, geometry hoặc audio stream.
+- [ ] R4.8 Kiểm thử trigger hai chiều, hit-test ở DPR/tỉ lệ màn hình khác nhau, mic privacy, touch target và FPS.
+
+**Gate R4:** bánh chỉ hiện đúng ngưỡng, bố cục bánh trái/card phải, topper đúng tâm, card đúng ba thành phần,
+không confetti/mascot phụ và mọi môi trường vẫn có cách tắt đủ nến.
+
+#### Phase R5 — Hành trình điều ước Cake → Hero
+
+- [ ] R5.1 Chuẩn hóa ba anchor dùng chung: nguồn từ ô điều ước, topper sao trên bánh và đầu đũa mascot Hero;
+  chuyển đổi chính xác giữa DOM, world space và screen space sau resize.
+- [ ] R5.2 Thay celebration cũ bằng chuỗi hạt/sao: chữ trong input tan thành hạt → hội tụ vào topper Cake.
+- [ ] R5.3 Tiếp tục đường bay topper Cake → sao trên đũa Hero trong renderer/canvas dùng chung, không teleport
+  hoặc tạo particle system thứ hai ngoài quản lý.
+- [ ] R5.4 Điều phối auto-scroll ngược Cake → Hero qua SectionManager, đồng bộ camera, active scene và đường bay.
+- [ ] R5.5 Cho phép wheel/touch/keyboard hủy auto-scroll an toàn; khóa chống kích hoạt lặp và phục hồi focus/
+  scroll state sau khi hoàn thành hoặc hủy.
+- [ ] R5.6 Reduced motion dùng fade/teleport có chủ đích; WebGL fallback dùng DOM/CSS nhưng giữ đúng thứ tự
+  input → topper → Hero.
+- [ ] R5.7 Reset nghi thức đưa mọi anchor, particle, nến, điều ước và active section về trạng thái test được.
+- [ ] R5.8 Kiểm thử full journey, resize giữa flight, scroll ngược xuôi, cancel, fallback và FPS.
+
+**Gate R5:** trình tự input → topper → đũa phép đúng, camera/scroll theo được đường bay, người dùng luôn có thể
+ngắt chuyển động và không phát sinh section/mascot chồng lấn.
+
+#### Phase R6 — Letter rebuild: phong bì duy nhất và chữ trên giấy
+
+- [ ] R6.1 Bỏ card thông tin, nút hiển thị và preview thư bên cạnh; section chỉ còn phong bì làm tâm điểm.
+- [ ] R6.2 Tạo vùng tương tác vô hình nhưng semantic bám phong bì để click/tap/Enter/Space mở thư; không làm mất
+  accessibility khi bỏ UI nút nhìn thấy.
+- [ ] R6.3 Sắp lại graph/layer và mask/clip: khi đóng giấy nằm trong lòng phong bì, bị che bởi miệng và hai mép;
+  khi mở giấy trượt lên phía trên nắp đã lật mà không xuyên hoặc lộ sai cạnh.
+- [ ] R6.4 Làm chậm mapping scroll-progress của seal, flap và paper; scroll mở liên tục theo phần trăm, còn click
+  chạy nhanh tới trạng thái mở hoàn toàn.
+- [ ] R6.5 Chọn và triển khai cơ chế đặt chữ trực tiếp trên bề mặt giấy (CanvasTexture hoặc DOM projection bám
+  giấy), giữ bản semantic riêng cho screen reader và nội dung từ config.
+- [ ] R6.6 Chỉ bắt đầu typing khi open progress đạt 100%; đóng/mở lại có quy tắc restart rõ ràng, reduced motion
+  hiển thị tức thì.
+- [ ] R6.7 Xử lý thư 1/10/20 câu bằng pagination, paper expansion hoặc vùng đọc phù hợp mà không đưa card phụ trở lại.
+- [ ] R6.8 Cân camera/scale cho desktop/mobile, WebGL fallback 2D, contrast và focus; cuộn tiếp sau khi đọc phải
+  bàn giao sạch sang Gallery placeholder.
+- [ ] R6.9 Kiểm thử layer ở các mốc 0/25/50/75/100%, click so với scroll, keyboard/touch, long copy và FPS.
+
+**Gate R6:** chỉ còn phong bì, giấy đúng layer ở mọi trạng thái, click mở nhanh/scroll mở chậm, chữ chỉ gõ sau
+100% và xuất hiện trên chính tờ giấy.
+
+#### Phase R7 — Spacing, z-index và nghiệm thu refinement toàn cục
+
+- [ ] R7.1 Định nghĩa token z-index dùng chung theo thứ tự background < section surface < main mascot <
+  journey particle < transition overlay < system overlay; loại bỏ magic number xung đột.
+- [ ] R7.2 Chuẩn hóa section stage, transition gutter và khoảng dừng đọc để có ranh giới rõ nhưng vẫn mang cảm
+  giác một khung hình/camera thay đổi.
+- [ ] R7.3 Rà soát bounding, visibility và lifecycle của mọi mascot/particle qua Intro/Hero/Cake/Letter.
+- [ ] R7.4 Chạy full journey hai chiều với wheel/touch/keyboard, refresh/deep-link, resize, reduced motion,
+  WebGL fallback, Lite Mode và focus/accessibility.
+- [ ] R7.5 Nghiệm thu browser matrix 1470×956, 1470×850, 1440×900, 390×844; không tràn ngang, lỗi console,
+  click xuyên hoặc hai section cùng tương tác.
+- [ ] R7.6 Đo FPS từng section và transition; tối thiểu 30 FPS trên máy tầm trung, cập nhật verify scripts và
+  production build.
+- [ ] R7.7 Ghi backlog polish còn lại, cập nhật tài liệu và mở gate Phase 5 chỉ sau khi toàn bộ R1–R7 đạt.
+
+**Gate R7:** toàn bộ acceptance criteria REFINEMENT-PLAN 1.0–1.5 đạt; Phase 1–4 regression vẫn xanh và Phase 5
+có thể bắt đầu mà không phải sửa lại kiến trúc section.
+
+#### Bảng ánh xạ REFINEMENT-PLAN → roadmap
+
+| Mục nguồn | Phase triển khai | Phạm vi |
+|---|---|---|
+| 1.0 Section navigation | R1 | SectionManager, active scene, transition, focus/pointer |
+| 1.1 Intro | R2 | Timeline tối/sáng và bàn giao Hero |
+| 1.2 Hero | R3 | Copy, card, font, mascot/trang trí, responsive |
+| 1.3 Cake | R4 + R5 | Layout/interaction nến và hành trình điều ước liên section |
+| 1.4 Letter | R6 | Rebuild phong bì, layer, tương tác và chữ trên giấy |
+| 1.5 Spacing & z-index | R7 | Token toàn cục, regression và performance gate |
+
+**Điểm feedback Phase R:** duyệt lần lượt sau từng gate; lỗi của phase nào được giữ trong phase đó, không gom
+thành một đợt “polish” lớn ở cuối.
+
+### Phase 5 — Gallery ảnh (tạm hoãn đến khi Phase R hoàn tất)
 
 - [ ] 5.1 Tạo pipeline tối ưu 35 ảnh: thumbnail/WebP dùng trên scene, giữ bản gốc cho modal khi cần.
 - [ ] 5.2 Khai báo thứ tự, caption, ngày và đoạn cảm xúc trong config; dùng placeholder ở bản đầu.
@@ -217,7 +401,7 @@ AGENTS.md / PLANNING.md / DESCRIPTION.md
 
 **Điểm feedback:** duyệt nhịp kể chuyện, kiểu khung, số ảnh hiện đồng thời và template caption.
 
-### Phase 6 — Outro, âm thanh và polish
+### Phase 6 — Outro, âm thanh và polish (tạm hoãn)
 
 - [ ] 6.1 Chọn/tạo bản Twinkle nhẹ nhàng có quyền sử dụng rõ ràng; chuẩn bị beep, sparkle và celebration SFX.
 - [ ] 6.2 Hoàn thiện `AudioManager`: mute/unmute, volume, fade, pause khi tab ẩn và lưu lựa chọn.
@@ -228,7 +412,7 @@ AGENTS.md / PLANNING.md / DESCRIPTION.md
 
 **Điểm feedback:** duyệt nhạc, âm lượng, Outro và trải nghiệm hoàn chỉnh từ đầu đến cuối.
 
-### Phase 7 — Bàn giao
+### Phase 7 — Bàn giao (tạm hoãn)
 
 - [ ] 7.1 Thay nội dung chính thức và rà soát lần cuối dữ liệu/ảnh cá nhân trước khi phát hành.
 - [ ] 7.2 Build production, kiểm tra bundle, asset path, cache và lỗi console.
@@ -240,7 +424,12 @@ AGENTS.md / PLANNING.md / DESCRIPTION.md
 
 ## 5. Rủi ro & phương án dự phòng
 - **Thiết bị yếu / trình duyệt cũ không hỗ trợ WebGL2** → fallback CSS animation 2D tối giản.
-- **Mic permission bị từ chối** → nút "Thổi nến" thủ công thay thế, không chặn luồng trải nghiệm.
+- **Mic permission bị từ chối** → click/tap từng ngọn nến là fallback chính; keyboard và bản 2D cung cấp
+  điều khiển tương đương, không chặn luồng trải nghiệm.
+- **Auto-scroll Cake → Hero gây mất kiểm soát** → chỉ kích hoạt sau nghi thức gửi điều ước, cho phép hủy ngay
+  bằng wheel/touch/keyboard và dùng chuyển trạng thái rút gọn khi reduced motion.
+- **Section hoặc mascot chồng lấn trong lúc refinement** → SectionManager là nguồn active state duy nhất;
+  phase chưa qua gate không được đẩy thay đổi sang section kế tiếp để che lỗi.
 - **Thời gian phát triển 3D chi tiết (mascot, model) tốn công** → giai đoạn đầu dùng shape đơn
   giản (sphere đầu + cone mũ chóp + đơn giản hoá) đúng phong cách "cute low-poly", có thể nâng cấp
   model sau nếu cần độ chi tiết cao hơn.

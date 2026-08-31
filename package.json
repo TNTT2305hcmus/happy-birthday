@@ -25,7 +25,13 @@
     "verify:phase3.7": "node scripts/verify-phase3-7.mjs",
     "verify:phase3.7:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-phase3-7.ps1",
     "verify:phase4.1": "node scripts/verify-phase4-1.mjs",
-    "verify:phase4.2": "node scripts/verify-phase4-2.mjs"
+    "verify:phase4.2": "node scripts/verify-phase4-2.mjs",
+    "verify:phase4.3": "node scripts/verify-phase4-3.mjs",
+    "verify:phase4.4": "node scripts/verify-phase4-4.mjs",
+    "verify:phase4.5": "node scripts/verify-phase4-5.mjs",
+    "verify:phase4.5:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-phase4-5.ps1",
+    "verify:refinement-r0": "node scripts/verify-refinement-r0.mjs",
+    "verify:refinement-r0:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-refinement-r0.ps1"
   },
   "dependencies": {
     "@fontsource/baloo-2": "^5.3.0",

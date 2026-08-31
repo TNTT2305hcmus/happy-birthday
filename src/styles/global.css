@@ -360,7 +360,7 @@ html[data-quality='lite'] .lite-notice {
 }
 
 .letter-toggle-button small {
-  color: var(--muted);
+  color: #6f5875;
   font-size: 0.7rem;
   line-height: 1.35;
 }
@@ -368,8 +368,12 @@ html[data-quality='lite'] .lite-notice {
 .letter-control-status {
   min-height: 1.2rem;
   margin: 0;
-  color: var(--muted);
+  color: #6f5875;
   font-size: 0.74rem;
+}
+
+.letter-experience {
+  display: grid;
 }
 
 .cake-controls {
@@ -1503,29 +1507,147 @@ h1 {
 }
 
 .letter-preview {
-  margin-top: 2rem;
-  padding: 1.5rem;
+  position: relative;
+  max-height: min(25rem, 44vh);
+  margin-top: 0.85rem;
+  padding: 1.25rem 1.25rem 0.75rem;
+  overflow: hidden;
   border-radius: 1rem;
   border: 1px solid rgb(255 217 138 / 48%);
-  background: rgb(255 253 247 / 94%);
+  background:
+    linear-gradient(90deg, transparent 2.25rem, rgb(255 158 207 / 12%) 2.25rem, rgb(255 158 207 / 12%) calc(2.25rem + 1px), transparent calc(2.25rem + 1px)),
+    repeating-linear-gradient(0deg, transparent 0, transparent 1.9rem, rgb(201 182 255 / 14%) 1.9rem, rgb(201 182 255 / 14%) calc(1.9rem + 1px)),
+    rgb(255 253 247 / 96%);
+  box-shadow: inset 0 0 2.5rem rgb(255 217 236 / 22%);
   color: var(--ink);
   font-family: var(--font-handwriting);
   font-size: 1.35rem;
   font-weight: 500;
   line-height: 1.55;
-  transform: rotate(-0.5deg);
+  opacity: 1;
+  transform: rotate(-0.35deg);
+  transform-origin: top center;
+  transition: max-height 420ms ease, margin 420ms ease, opacity 240ms ease, padding 420ms ease, transform 420ms ease;
+}
+
+.letter-preview[aria-hidden='true'] {
+  max-height: 0;
+  margin-top: 0;
+  padding-block: 0;
+  border-color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-0.75rem) rotate(-0.35deg) scaleY(0.92);
+}
+
+.letter-preview-scroll {
+  max-height: min(20.5rem, 35vh);
+  padding: 0.15rem 0.5rem 1rem 1.55rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  color: #4f3656;
+  overscroll-behavior: contain;
+  scrollbar-color: rgb(207 93 142 / 45%) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.letter-preview-scroll::-webkit-scrollbar {
+  width: 0.45rem;
+}
+
+.letter-preview-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(174 80 122 / 48%);
+}
+
+.letter-preview-scroll:focus-visible {
+  border-radius: 0.5rem;
+  outline: 2px solid var(--pink-strong);
+  outline-offset: 2px;
 }
 
 .letter-preview p {
   margin: 0 0 0.7rem;
 }
 
-.letter-preview .muted-copy {
-  margin-bottom: 0;
+.letter-preview .letter-salutation {
+  color: var(--pink-strong);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.letter-preview[data-letter-reveal='writing'] .letter-salutation,
+.letter-preview[data-letter-reveal='writing'] .letter-handwriting-line,
+.letter-preview[data-letter-reveal='writing'] .letter-signature {
+  animation: letter-ink-reveal var(--letter-duration, 0.65s) steps(var(--letter-steps, 18), end) var(--letter-delay, 0s) both;
+  will-change: clip-path, opacity, transform;
+}
+
+.letter-preview[data-letter-reveal='writing'] .letter-salutation {
+  --letter-delay: 0.18s;
+  --letter-duration: 0.52s;
+  --letter-steps: 14;
+}
+
+.letter-preview[data-letter-reveal='writing'] .letter-signature {
+  --letter-duration: 0.8s;
+  --letter-steps: 20;
+}
+
+.letter-empty-copy {
   color: var(--muted);
+  font-style: italic;
+}
+
+.letter-signature {
+  display: grid;
+  justify-items: end;
+  margin-top: 1.2rem;
+  color: var(--pink-strong);
+  line-height: 1.15;
+}
+
+.letter-signature strong {
+  font-size: 1.45rem;
+}
+
+.letter-placeholder-note {
+  margin: 0.55rem 0 0 !important;
+  padding-top: 0.55rem;
+  border-top: 1px dashed rgb(207 93 142 / 20%);
+  color: #725c78;
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.letter-experience[data-content-length='short'] .letter-preview-scroll {
+  max-height: 14rem;
+}
+
+.letter-experience[data-content-length='extended'] .letter-preview-scroll {
+  padding-right: 0.8rem;
+}
+
+@keyframes letter-ink-reveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.12;
+    transform: translateY(0.14em);
+  }
+  14% {
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 -0.15em 0 0);
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .gallery-preview {
@@ -2233,6 +2355,77 @@ h1 {
   .cake-reset-button {
     min-height: 2.75rem;
   }
+
+  .letter-story-section {
+    min-height: 100svh;
+    padding-block: 4.75rem 1.5rem;
+  }
+
+  .letter-copy-panel {
+    width: min(520px, 43vw);
+    padding: clamp(1.15rem, 2.35vh, 1.55rem);
+    border-radius: 1.6rem;
+  }
+
+  .letter-copy-panel .section-heading {
+    min-height: 1.5rem;
+  }
+
+  .letter-copy-panel .section-icon {
+    font-size: 1.45rem;
+  }
+
+  .letter-copy-panel .eyebrow {
+    margin-top: 0.55rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .letter-copy-panel h1 {
+    font-size: clamp(2.15rem, 5vh, 3rem);
+    line-height: 0.94;
+  }
+
+  .letter-copy-panel .section-description {
+    margin-top: 0.55rem;
+    font-size: 0.88rem;
+    line-height: 1.4;
+  }
+
+  .letter-copy-panel .phase-note {
+    display: none;
+  }
+
+  .letter-controls {
+    gap: 0.3rem;
+    margin-top: 0.7rem;
+  }
+
+  .letter-toggle-button {
+    min-height: 3rem;
+    padding-block: 0.5rem;
+  }
+
+  .letter-control-status {
+    min-height: 1rem;
+  }
+
+  .letter-preview {
+    max-height: min(22.5rem, 41vh);
+    margin-top: 0.45rem;
+    padding: 0.85rem 0.9rem 0.55rem;
+  }
+
+  .letter-preview-scroll {
+    max-height: min(18.4rem, 32vh);
+    padding: 0.1rem 0.35rem 0.7rem 1.35rem;
+    font-size: 1.18rem;
+    line-height: 1.42;
+  }
+
+  .letter-placeholder-note {
+    margin-top: 0.4rem !important;
+    padding-top: 0.4rem;
+  }
 }
 
 @media (max-width: 700px) {
@@ -2278,6 +2471,22 @@ h1 {
     min-width: 0;
     margin-right: 0;
     padding: 1.4rem;
+  }
+
+  .letter-preview {
+    max-height: min(28rem, 48vh);
+    padding-inline: 0.85rem;
+    font-size: 1.2rem;
+  }
+
+  .letter-preview-scroll {
+    max-height: min(23rem, 39vh);
+    padding-left: 1.1rem;
+  }
+
+  .letter-toggle-button {
+    width: 100%;
+    min-height: 3.25rem;
   }
 
   .hero-story-section {
@@ -2480,6 +2689,19 @@ h1 {
 
   .letter-toggle-button {
     transition: none;
+  }
+
+  .letter-preview {
+    transition: none;
+  }
+
+  .letter-preview[data-letter-reveal='writing'] .letter-salutation,
+  .letter-preview[data-letter-reveal='writing'] .letter-handwriting-line,
+  .letter-preview[data-letter-reveal='writing'] .letter-signature {
+    animation: none;
+    clip-path: none;
+    opacity: 1;
+    transform: none;
   }
 
   .hero-fallback-fairy {
