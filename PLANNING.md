@@ -272,33 +272,103 @@ không click xuyên section ẩn, không giật do nhiều scene cùng update.
 
 #### Phase R2 — Refinement Intro và chuyển cảnh sang Hero
 
-- [ ] R2.1 Giữ nguyên terminal, Matrix rain, lock input 10 giây và trạng thái hoàn tất hiện tại.
-- [ ] R2.2 Gỡ shatter/fragments, star burst và confetti khỏi chuyển cảnh Intro.
-- [ ] R2.3 Dựng timeline mới: đạt 100% → giữ 3 giây → tối dần tới đen trong 3 giây → sáng dần vào Hero trong
+- [x] R2.1 Giữ nguyên terminal, Matrix rain, lock input 10 giây và trạng thái hoàn tất hiện tại.
+- [x] R2.2 Gỡ shatter/fragments, star burst và confetti khỏi chuyển cảnh Intro.
+- [x] R2.3 Dựng timeline mới: đạt 100% → giữ 3 giây → tối dần tới đen trong 3 giây → sáng dần vào Hero trong
   2 giây.
-- [ ] R2.4 Bàn giao active section cho SectionManager tại màn đen, bảo đảm Intro không xuất hiện lại hoặc nhận
+- [x] R2.4 Bàn giao active section cho SectionManager tại màn đen, bảo đảm Intro không xuất hiện lại hoặc nhận
   pointer/focus sau khi Hero sáng hoàn toàn.
-- [ ] R2.5 Thêm watchdog/fallback cho lỗi animation và phiên bản reduced motion vẫn giữ đúng thứ tự trạng thái.
-- [ ] R2.6 Kiểm thử timing bằng clock, refresh, tab background/foreground và entry mặc định lẫn stage landing.
+- [x] R2.5 Thêm watchdog/fallback cho lỗi animation và phiên bản reduced motion vẫn giữ đúng thứ tự trạng thái.
+- [x] R2.6 Kiểm thử timing bằng clock, refresh, tab background/foreground và entry mặc định lẫn stage landing.
+  - [x] Clock model đạt đúng biên 2.999/3.000/4.999/5.000 ms; listener visibilitychange/pageshow bắt kịp
+  wall-clock khi tab trở lại và không phụ thuộc CSS animationend.
+  - [x] Edge headless 1470×850: entry mặc định đạt fade 3.007s → 2.033s; stage landing đạt 3.053s → 1.996s;
+  mô phỏng foreground phục hồi trong 4ms và kết thúc chỉ Hero có thể tương tác.
+  - [x] Landing không còn chờ AudioContext unlock; browser chặn audio không thể làm treo animation.
+  - [x] Lint, production build, regression Phase 1/R1 và verify:refinement-r2 đạt.
 
 **Gate R2:** không còn hiệu ứng nứt vỡ/confetti; timing 3s giữ → 3s tối → 2s sáng đạt sai số kiểm thử cho phép,
 kết thúc ở Hero duy nhất.
 
 #### Phase R3 — Hero redesign
 
-- [ ] R3.1 Chuyển toàn bộ copy Hero mới vào config: tag ngày, tiêu đề script “Happy Birthday Ngiu Hiền Lương
+- [x] R3.1 Chuyển toàn bộ copy Hero mới vào config: tag ngày, tiêu đề script “Happy Birthday Ngiu Hiền Lương
   xinh đẹp của a” và dòng thời gian/only-you; xác nhận UTF-8 và glyph tiếng Việt, đặc biệt chữ “Hiền”.
-- [ ] R3.2 Thu gọn card chính và chỉ giữ ba nhóm nội dung đã duyệt; bỏ ba stat block và bỏ CTA bắt đầu hành trình.
-- [ ] R3.3 Dựng typography script/bay bổng, line wrapping và contrast cho desktop/mobile/fallback.
-- [ ] R3.4 Tạo loop reveal/marquee chậm cùng gradient cho cụm “I love u… only you”; reduced motion hiển thị tĩnh.
-- [ ] R3.5 Giữ pose/model mascot chính, sửa ngôi sao trên mũ thẳng tâm với chóp mũ ở mọi animation/scale.
-- [ ] R3.6 Thêm mascot tiên nhỏ ở góc trên phải và 2–3 star companion nguyên bản ở đáy card; hướng bố cục hội
-  tụ vào nội dung, có budget geometry/particle rõ ràng.
-- [ ] R3.7 Cân lại responsive placement, pointer parallax, fallback 2D, Lite Mode và vùng an toàn 1470×850.
-- [ ] R3.8 Kiểm thử screenshot/DOM text UTF-8, không còn stat/CTA cũ, không tràn ngang và đo FPS Full/Lite.
+- [x] R3.2 Thu gọn card chính và chỉ giữ ba nhóm nội dung đã duyệt; bỏ ba stat block và bỏ CTA bắt đầu hành trình.
+- [x] R3.3 Dựng typography script/bay bổng, line wrapping và contrast cho desktop/mobile/fallback.
+- [x] R3.4 Tạo loop reveal/marquee chậm cùng gradient cho cụm “I love u… only you”; reduced motion hiển thị tĩnh.
+  - [x] Copy Hero mới nằm hoàn toàn trong content/config.js; headline giữ đúng UTF-8 “Hiền Lương”.
+  - [x] Dancing Script self-host/OFL có subset Vietnamese; Quicksand là fallback đầy đủ dấu, không dùng CDN.
+  - [x] Card chỉ còn tag ngày, headline và timeline/only-you; DOM không còn stat, milestone hoặc CTA cũ.
+  - [x] Edge headless đạt 61 FPS tại 1470×850, 61 FPS reduced-motion tại 1440×900 và 60 FPS tại
+  390×844; WebGL fallback 390×844 cũng giữ card/text trong khung. Mọi case không tràn ngang và reduced
+  motion hiển thị tĩnh.
+- [x] R3.5 Cân lại thứ bậc nội dung và tăng chất lãng mạn trước khi thêm vật thể trang trí.
+  - [x] Giữ tag ngày sinh nhật làm thông tin phụ; thay câu timeline khô bằng một câu cảm xúc lấy từ config,
+    ưu tiên mô-típ “1.111 ngày được bên em bé” nhưng phải ghi rõ đây là cột mốc 16/09/2026, không làm sai mốc
+    1.112 ngày tại sinh nhật 17/09/2026.
+  - [x] Tăng kích thước/contrast của “I love u… only you” để trở thành điểm nhấn thị giác thứ hai sau headline;
+    vẫn giữ reveal/gradient chậm và trạng thái tĩnh cho reduced motion.
+  - [x] Thêm một trái tim nhỏ pulse cạnh tên trong headline và sparkle nhẹ cạnh tag; không animate toàn bộ chữ,
+    không làm thay đổi semantic text hoặc khiến screen reader đọc icon trang trí.
+  - [x] Lint, production build và verify R3.5 đạt; Edge headless ghi nhận 61 FPS tại 1470×850, 60 FPS ở
+    reduced-motion 1440×900 và 61 FPS tại 390×844; fallback mobile không tràn ngang hoặc vượt khung.
+- [x] R3.6 Hoàn thiện mascot chính làm neo thị giác cho nửa phải.
+  - [x] Giữ pose/model hiện tại; sửa ngôi sao trên mũ thẳng tâm với chóp mũ ở mọi animation, breakpoint và scale.
+  - [x] Thêm halo mềm vàng–hồng phía sau mascot bằng một lớp/draw call nhẹ; halo không được làm giảm contrast card.
+  - [x] Cân lại vị trí/scale mascot và dải gradient blend ở vùng giữa card–mascot để hai nửa Hero hòa vào nhau,
+    đồng thời chừa vùng thở rõ quanh headline.
+  - [x] Halo dùng đúng một draw call và đi cùng transform mascot; phép đo ổn định 2 giây trên Edge headless đạt
+    54 FPS tại 1470×850, 60 FPS reduced-motion, 57 FPS mobile và 57 FPS fallback mobile; lint, build và
+    regression 2.2–2.3 đạt.
+- [ ] R3.7 Làm đầy khoảng trống bên phải bằng một bộ trang trí tĩnh có giới hạn, nghiệm thu bố cục trước khi animate.
+  - [ ] Thêm garland “HAPPY BIRTHDAY” viết tay cong nhẹ phía trên mascot, treo bằng hai dây mảnh; chữ là nội dung
+    trang trí `aria-hidden`, không cạnh tranh với headline chính.
+  - [ ] Bố trí 3–4 bóng bay/lồng đèn tim với kích thước và độ sâu khác nhau trong khoảng card–mascot; không xếp đều,
+    không che mặt, đũa phép, headline hoặc love line.
+  - [ ] Thêm một cụm hoa/lá low-poly nhỏ dưới mascot để tạo cảm giác có mặt đất; ưu tiên geometry dùng chung,
+    không dùng texture/model ngoài và có thể tắt cả cụm trong Lite Mode.
+- [ ] R3.8 Thêm chuyển động phép thuật chính cho mascot và đũa phép.
+  - [ ] Tạo một idle gesture ngắn lặp chậm: mascot vẫy đũa, đầu đũa phát sparkle rồi rắc trail kim tuyến xuống;
+    trail rộng/dài hơn hiện tại nhưng phải dùng lại `MagicTrail`, có trần hạt Full/Lite và không phát liên tục dày đặc.
+  - [ ] Garland và bóng bay chỉ đung đưa lệch pha rất nhẹ; reduced motion giữ tĩnh, không thay bằng loop khác.
+  - [ ] Mỗi vài giây chỉ cho phép một shooting-star trail chạy chéo rồi mờ hẳn; tái sử dụng pool, tạm dừng khi Hero
+    không active hoặc tab bị ẩn.
+- [ ] R3.9 Bổ sung nhân vật phụ để nửa phải có câu chuyện nhưng không tạo thêm một mascot chính cạnh tranh.
+  - [ ] Thêm một tiên nhỏ nguyên bản ở góc trên phải, hướng mặt/thân và đường bay về vùng trung tâm; dùng biến thể
+    đơn giản của hệ mascot hiện có, không sao chép nhân vật tham khảo có bản quyền.
+  - [ ] Thêm tối đa hai companion phi nhân hình (bướm, chim nhỏ hoặc trái tim biết bay) chạy quỹ đạo elip chậm quanh
+    mascot chính; Lite Mode chỉ giữ một companion và reduced motion đặt chúng ở pose tĩnh.
+  - [ ] Thêm bong bóng thoại nhỏ gắn với mascot: “Chúc mừng sinh nhật nàng tiên của anh 💗”; copy nằm trong config,
+    tự đổi hướng/ẩn khi không đủ chỗ và không che khuôn mặt hoặc card.
+- [ ] R3.10 Chuẩn hóa chiều sâu ba lớp và pointer parallax cho toàn Hero.
+  - [ ] Lớp xa gồm gradient/sao nền; lớp giữa gồm mascot, halo và companion; lớp gần gồm garland, bóng bay gần và
+    sparkle. Mỗi lớp có hệ số parallax riêng nhưng cùng chịu progress/active state từ SectionManager.
+  - [ ] Giới hạn pointer offset, nội suy mượt và reset khi pointer rời viewport; không để vật thể vượt vùng an toàn
+    hoặc gây say chuyển động.
+  - [ ] Công bố budget cho số geometry, draw call và particle của toàn Hero; không tạo renderer/canvas hay RAF loop mới.
+- [ ] R3.11 Cân responsive và các chế độ suy giảm sau khi bản desktop được duyệt.
+  - [ ] Nghiệm thu trước tại 1470×956, vùng an toàn 1470×850 và regression 1440×900; sau đó mới xếp lại tablet/mobile
+    theo ưu tiên giữ headline, love line và mascot chính.
+  - [ ] Ở compact/mobile, cho phép ẩn lần lượt cụm hoa, shooting star, một phần bóng bay, companion thứ hai và tiên phụ;
+    không thu nhỏ tất cả tới mức khó đọc chỉ để giữ đủ trang trí.
+  - [ ] WebGL fallback 2D giữ cùng quan hệ card–mascot–halo và một bộ trang trí rút gọn; Lite Mode giảm hạt/geometry,
+    còn reduced motion loại loop, marquee chuyển động, sway và parallax nhưng giữ nguyên nội dung.
+- [ ] R3.12 Kiểm thử và chốt Gate Hero redesign.
+  - [ ] Kiểm tra screenshot/bounding tại toàn bộ viewport mục tiêu, hai chiều scroll/transition và deep-link Hero;
+    không tràn ngang, không che chữ, không click xuyên section và không để focus trong phần trang trí ẩn.
+  - [ ] Kiểm tra DOM/copy UTF-8, “Hiền Lương” đủ dấu, mốc 1.111/1.112 không sai, không còn stat/CTA cũ và icon
+    trang trí không làm nhiễu accessibility tree.
+  - [ ] Đo FPS Full/Lite trong idle, pointer parallax và chuỗi vẫy đũa/shooting star; kiểm tra giải phóng pool/listener
+    khi rời Hero, lint, production build và toàn bộ regression Phase 1–R2.
 
-**Gate R3:** copy đủ dấu, card đúng ba nhóm nội dung, các trang trí không che chữ, sao trên mũ đúng trục và
-Hero đạt tối thiểu 30 FPS.
+**Các điểm review nhỏ của R3:** duyệt lần lượt sau R3.5 (copy), R3.6 (neo mascot), R3.7 (mật độ tĩnh),
+R3.8–R3.9 (nhịp chuyển động/nhân vật phụ) và R3.11 (responsive). Không triển khai lát kế tiếp để che lỗi bố cục
+của lát trước.
+
+**Gate R3:** copy đủ dấu và đúng mốc ngày; card giữ đúng ba nhóm nội dung; nửa phải đầy nhưng có một tâm điểm chính;
+trang trí không che chữ/mặt/đũa phép; sao trên mũ đúng trục; reduced motion, fallback và Lite Mode đầy đủ; Hero đạt
+tối thiểu 30 FPS trên máy tầm trung.
 
 #### Phase R4 — Cake layout, trigger và tương tác nến
 

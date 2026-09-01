@@ -32,7 +32,7 @@ for (const componentFile of [
   'MatrixRain.jsx',
   'PerformanceDebugHud.jsx',
   'RuntimeNotices.jsx',
-  'StarBurstTransition.jsx',
+  'IntroHeroFadeTransition.jsx',
   'StorySection.jsx',
   'heroOverlayModel.js',
   'storyNavigation.js',

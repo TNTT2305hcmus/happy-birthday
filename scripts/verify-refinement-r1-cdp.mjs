@@ -108,7 +108,7 @@ if (includeIntro) {
   for (let attempt = 0; attempt < 110; attempt += 1) {
     const state = await evaluate('(' + (() => ({
       hasHack: Boolean(document.querySelector('.hack-intro')),
-      hasTransition: Boolean(document.querySelector('.star-burst-transition')),
+      hasTransition: Boolean(document.querySelector('.intro-hero-fade')),
       locked: document.documentElement.dataset.introLocked === 'true',
     })).toString() + ')()')
     sawIntroLock ||= state.locked

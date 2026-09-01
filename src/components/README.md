@@ -9,11 +9,11 @@ Các module trong thư mục này là lớp giao diện React/DOM nằm trên ca
 | `HackIntro.jsx` | Hiển thị terminal giả lập, progress 10 giây, trạng thái hoàn tất và các beep hỗ trợ. |
 | `CakeControls.jsx` | Nút thổi nến thủ công và vùng trạng thái live phản ánh số nến còn sáng từ `CakeScene`. |
 | `HeroFallbackFairy.jsx` | Mascot tiên 2D nguyên bản dựng bằng HTML/CSS khi WebGL2 không khả dụng. |
-| `HeroOverlay.jsx` | Overlay Hero gồm lời chúc, tên, các mốc quan hệ, CTA và mascot fallback. |
+| `HeroOverlay.jsx` | Overlay Hero compact gồm tag ngày, headline script và timeline/only-you loop; mascot fallback dùng chung sân khấu. |
 | `MatrixRain.jsx` | Canvas 2D vẽ hiệu ứng ký tự rơi phía sau intro hacker. |
 | `PerformanceDebugHud.jsx` | Bảng chẩn đoán bật bằng `?debug=performance`, hiển thị FPS, quality và trạng thái WebGL. |
 | `RuntimeNotices.jsx` | Thông báo nhẹ cho WebGL fallback và Lite Mode qua các thuộc tính runtime trên `html`. |
-| `StarBurstTransition.jsx` | Transition canvas 2D từ intro hacker sang Hero bằng vụ nổ sao hồng. |
+| `IntroHeroFadeTransition.jsx` | Fade Intro về đen, bàn giao Hero tại màn đen rồi sáng dần theo clock đơn điệu. |
 | `StorySection.jsx` | Chọn giao diện Hero/Cake hoặc shell phù hợp cho từng section và cung cấp placeholder cho các phase chưa triển khai. |
 | `heroOverlayModel.js` | Chuyển dữ liệu cá nhân hóa từ config thành model hiển thị đã định dạng cho Hero. |
 | `storyNavigation.js` | Điều hướng CTA giữa các section, giữ query phục vụ chế độ demo và tôn trọng reduced motion. |

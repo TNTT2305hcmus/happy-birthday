@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { audioManager } from '../core/AudioManager.js'
 import { HackIntro } from './HackIntro.jsx'
-import { StarBurstTransition } from './StarBurstTransition.jsx'
+import { IntroHeroFadeTransition } from './IntroHeroFadeTransition.jsx'
 
 const LOCKED_KEYS = new Set([
   ' ',
@@ -25,8 +25,20 @@ export function ExperienceGate({ content, initialStage = 'landing', onStageChang
     onStageChange?.(stage)
   }, [onStageChange, stage])
 
+  useEffect(() => {
+    const root = document.documentElement
+    root.dataset.experienceStage = stage
+    return () => {
+      if (root.dataset.experienceStage === stage) delete root.dataset.experienceStage
+    }
+  }, [stage])
+
   const beginTransition = useCallback(() => {
-    setStage((currentStage) => currentStage === 'hacker' ? 'transition' : currentStage)
+    setStage((currentStage) => currentStage === 'hacker' ? 'fade-out' : currentStage)
+  }, [])
+
+  const revealHero = useCallback(() => {
+    setStage((currentStage) => currentStage === 'fade-out' ? 'hero-reveal' : currentStage)
   }, [])
 
   const completeTransition = useCallback(() => {
@@ -52,7 +64,7 @@ export function ExperienceGate({ content, initialStage = 'landing', onStageChang
   ])
 
   useEffect(() => {
-    if (stage !== 'hacker' && stage !== 'transition') {
+    if (!['hacker', 'fade-out', 'hero-reveal'].includes(stage)) {
       return undefined
     }
 
@@ -92,40 +104,46 @@ export function ExperienceGate({ content, initialStage = 'landing', onStageChang
     }
   }, [stage])
 
-  async function activateExperience() {
+  function activateExperience() {
     if (isActivating) {
       return
     }
 
     setIsActivating(true)
-
-    try {
-      await audioManager.unlock()
-      audioManager.playTone({ duration: 0.08, frequency: 880, volume: 0.025 })
-    } catch (error) {
-      console.warn('Audio could not be unlocked; continuing silently.', error)
-    }
-
     setStage('hacker')
+    audioManager.unlock()
+      .then((isUnlocked) => {
+        if (isUnlocked) {
+          audioManager.playTone({ duration: 0.08, frequency: 880, volume: 0.025 })
+        }
+      })
+      .catch((error) => {
+        console.warn('Audio could not be unlocked; continuing silently.', error)
+      })
   }
 
   if (stage === 'complete') {
     return null
   }
 
-  if (stage === 'hacker' || stage === 'transition') {
+  if (stage === 'hacker' || stage === 'fade-out' || stage === 'hero-reveal') {
     return (
       <>
-        <HackIntro
-          content={content.intro}
-          completeHoldMs={content.experience.introCompleteHoldMs}
-          durationMs={content.experience.introLockDurationMs}
-          isExiting={stage === 'transition'}
-          onComplete={beginTransition}
-        />
-        {stage === 'transition' && (
-          <StarBurstTransition
-            durationMs={content.experience.transitionDurationMs}
+        {(stage === 'hacker' || stage === 'fade-out') && (
+          <HackIntro
+            key={'hack-intro'}
+            content={content.intro}
+            completeHoldMs={content.experience.introCompleteHoldMs}
+            durationMs={content.experience.introLockDurationMs}
+            onComplete={beginTransition}
+          />
+        )}
+        {(stage === 'fade-out' || stage === 'hero-reveal') && (
+          <IntroHeroFadeTransition
+            key={'intro-hero-fade'}
+            fadeInMs={content.experience.heroFadeInDurationMs}
+            fadeOutMs={content.experience.introFadeToBlackDurationMs}
+            onBlackout={revealHero}
             onComplete={completeTransition}
           />
         )}

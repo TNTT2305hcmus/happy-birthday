@@ -39,8 +39,8 @@ heroScene.mount({
 heroScene.resize({ height: 900, width: 1_440 })
 
 assert.equal(scene.getObjectByName('original-fairy-mascot'), heroScene.mascot.group)
-assert.equal(heroScene.mascot.group.position.x, 2.25)
-assert.equal(heroScene.mascot.group.scale.x, 0.72)
+assert.equal(heroScene.mascot.group.position.x, 1.95)
+assert.equal(heroScene.mascot.group.scale.x, 0.78)
 
 heroScene.resize({ height: 844, width: 390 })
 assert.equal(heroScene.mascot.group.scale.x, 0.48)

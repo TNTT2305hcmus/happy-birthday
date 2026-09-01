@@ -33,11 +33,20 @@
     "verify:refinement-r0": "node scripts/verify-refinement-r0.mjs",
     "verify:refinement-r0:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-refinement-r0.ps1",
     "verify:refinement-r1": "node scripts/verify-refinement-r1.mjs",
-    "verify:refinement-r1:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-refinement-r1.ps1"
+    "verify:refinement-r1:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-refinement-r1.ps1",
+    "verify:refinement-r2": "node scripts/verify-refinement-r2.mjs",
+    "verify:refinement-r2:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-refinement-r2.ps1",
+    "verify:refinement-r3.1-3.4": "node scripts/verify-refinement-r3-1-4.mjs",
+    "verify:refinement-r3.1-3.4:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-refinement-r3-1-4.ps1",
+    "verify:refinement-r3.5": "node scripts/verify-refinement-r3-1-4.mjs",
+    "verify:refinement-r3.5:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-refinement-r3-1-4.ps1",
+    "verify:refinement-r3.6": "node scripts/verify-refinement-r3-6.mjs",
+    "verify:refinement-r3.6:browser": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-browser-refinement-r3-1-4.ps1"
   },
   "dependencies": {
     "@fontsource/baloo-2": "^5.3.0",
     "@fontsource/caveat": "^5.3.0",
+    "@fontsource/dancing-script": "^5.3.0",
     "@fontsource/quicksand": "^5.3.0",
     "gsap": "^3.15.0",
     "howler": "^2.2.4",

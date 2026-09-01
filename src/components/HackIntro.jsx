@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { audioManager } from '../core/AudioManager.js'
 import { MatrixRain } from './MatrixRain.jsx'
 
-export function HackIntro({ content, completeHoldMs, durationMs, isExiting = false, onComplete }) {
+export function HackIntro({ content, completeHoldMs, durationMs, onComplete }) {
   const [progress, setProgress] = useState(0)
   const [visibleLineCount, setVisibleLineCount] = useState(1)
   const lastBeepLine = useRef(0)
@@ -45,7 +45,7 @@ export function HackIntro({ content, completeHoldMs, durationMs, isExiting = fal
 
   return (
     <div
-      className={`hack-intro${isExiting ? ' is-exiting' : ''}`}
+      className={'hack-intro'}
       role="dialog"
       aria-labelledby="hack-title"
       aria-modal="true"

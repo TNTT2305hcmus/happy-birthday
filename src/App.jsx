@@ -38,7 +38,7 @@ function App() {
   }, [])
 
   const handleExperienceStageChange = useCallback((stage) => {
-    setIntroActive(stage !== 'complete')
+    setIntroActive(stage !== 'hero-reveal' && stage !== 'complete')
   }, [])
 
   useEffect(() => {

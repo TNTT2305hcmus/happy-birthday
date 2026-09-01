@@ -6,7 +6,8 @@ import { PerformanceMonitor } from '../src/core/PerformanceMonitor.js'
 assert.equal(birthdayContent.experience.introLockDurationMs, 10_000)
 assert.equal(birthdayContent.experience.introCompleteHoldMs, 3_000)
 assert.equal(birthdayContent.experience.allowIntroSkip, false)
-assert.ok(birthdayContent.experience.transitionDurationMs >= 1_000)
+assert.equal(birthdayContent.experience.introFadeToBlackDurationMs, 3_000)
+assert.equal(birthdayContent.experience.heroFadeInDurationMs, 2_000)
 assert.equal(birthdayContent.sections.length, 6)
 assert.equal(birthdayContent.sections.find(({ id }) => id === 'gallery').items.length, 35)
 assert.equal(getRequestedSection(birthdayContent.sections, '?section=hero'), 'hero')
@@ -32,5 +33,6 @@ console.log('Phase 1 verification passed:', {
   liteModeSample,
   sectionCount: birthdayContent.sections.length,
   introCompleteHoldMs: birthdayContent.experience.introCompleteHoldMs,
-  transitionDurationMs: birthdayContent.experience.transitionDurationMs,
+  introFadeToBlackDurationMs: birthdayContent.experience.introFadeToBlackDurationMs,
+  heroFadeInDurationMs: birthdayContent.experience.heroFadeInDurationMs,
 })

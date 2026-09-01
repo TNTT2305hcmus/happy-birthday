@@ -6,6 +6,7 @@ import {
   Group,
   HemisphereLight,
   Mesh,
+  PlaneGeometry,
   ShaderMaterial,
   SphereGeometry,
   Vector2,
@@ -46,6 +47,33 @@ const skyFragmentShader = /* glsl */ `
   }
 `
 
+const haloVertexShader = /* glsl */ `
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const haloFragmentShader = /* glsl */ `
+  uniform vec3 uGoldColor;
+  uniform vec3 uPinkColor;
+
+  varying vec2 vUv;
+
+  void main() {
+    vec2 centered = vec2((vUv.x - 0.5) * 0.82, vUv.y - 0.5);
+    float distanceFromCenter = length(centered);
+    float glow = 1.0 - smoothstep(0.08, 0.5, distanceFromCenter);
+    float alpha = pow(max(glow, 0.0), 1.7) * 0.34;
+    vec3 color = mix(uPinkColor, uGoldColor, smoothstep(0.18, 0.82, vUv.y));
+
+    if (alpha < 0.01) discard;
+    gl_FragColor = vec4(color, alpha);
+  }
+`
+
 export class HeroScene {
   constructor() {
     this.group = new Group()
@@ -65,6 +93,7 @@ export class HeroScene {
     this.isActive = true
     this.qualityMode = 'full'
     this.mascot = null
+    this.mascotHalo = null
     this.magicTrail = null
     this.starField = null
     this.sky = null
@@ -114,6 +143,23 @@ export class HeroScene {
     this.group.add(hemisphereLight, ambientLight, keyLight)
 
     this.mascot = new FairyMascot()
+    this.mascotHalo = new Mesh(
+      new PlaneGeometry(3.6, 4.4),
+      new ShaderMaterial({
+        depthWrite: false,
+        fragmentShader: haloFragmentShader,
+        transparent: true,
+        uniforms: {
+          uGoldColor: { value: new Color(0xffe6a8) },
+          uPinkColor: { value: new Color(0xffb8da) },
+        },
+        vertexShader: haloVertexShader,
+      }),
+    )
+    this.mascotHalo.name = 'fairy-mascot-halo'
+    this.mascotHalo.position.set(0, 0.48, -0.55)
+    this.mascotHalo.renderOrder = -10
+    this.mascot.group.add(this.mascotHalo)
     this.group.add(this.mascot.group)
     this.magicTrail = new MagicTrail({ qualityMode: context.qualityMode })
     this.group.add(this.magicTrail.points)
@@ -172,11 +218,11 @@ export class HeroScene {
       this.mascot.group.position.set(1.05, -0.66, 0.25)
       this.mascot.group.scale.setScalar(0.48)
     } else if (aspect < 1.35) {
-      this.mascot.group.position.set(1.72, -0.45, 0.18)
-      this.mascot.group.scale.setScalar(0.61)
+      this.mascot.group.position.set(1.62, -0.43, 0.18)
+      this.mascot.group.scale.setScalar(0.64)
     } else {
-      this.mascot.group.position.set(2.25, -0.34, 0.12)
-      this.mascot.group.scale.setScalar(0.72)
+      this.mascot.group.position.set(1.95, -0.32, 0.12)
+      this.mascot.group.scale.setScalar(0.78)
     }
     this.baseMascotPosition.copy(this.mascot.group.position)
   }

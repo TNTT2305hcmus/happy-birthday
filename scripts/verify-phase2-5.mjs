@@ -3,8 +3,8 @@ import { navigateToStorySection } from '../src/components/storyNavigation.js'
 import { birthdayContent } from '../src/content/config.js'
 
 const heroSection = birthdayContent.sections.find(({ id }) => id === 'hero')
-assert.equal(heroSection.heroCopy.ctaTarget, 'cake')
-assert.ok(heroSection.heroCopy.ctaLabel)
+assert.equal('ctaTarget' in heroSection.heroCopy, false)
+assert.equal('ctaLabel' in heroSection.heroCopy, false)
 
 let scrollOptions = null
 let focusOptions = null
@@ -48,5 +48,5 @@ console.log('Phase 2.5 verification passed:', {
   demoFallback: true,
   focusManagement: true,
   reducedMotion: true,
-  target: heroSection.heroCopy.ctaTarget,
+  target: 'cake',
 })

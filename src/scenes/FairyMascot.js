@@ -338,14 +338,21 @@ export class FairyMascot {
     )
     crown.rotation.z = -0.13
 
+    const crownAxis = new Vector3(0, 1, 0).applyQuaternion(crown.quaternion).normalize()
+    const crownTip = crown.position.clone().addScaledVector(crownAxis, 0.39)
+
     const hatStar = addNamedMesh(
       this.group,
       createStarGeometry(0.105, 0.048, 0.035),
       this.materials.gold,
       'fairy-hat-star',
-      [-0.14, 2.25, 0.02],
+      [crownTip.x, crownTip.y, 0.02],
     )
-    hatStar.rotation.z = 0.12
+    hatStar.position.addScaledVector(crownAxis, 0.045)
+    hatStar.rotation.z = crown.rotation.z
+    this.parts.hatCrown = crown
+    this.parts.hatStar = hatStar
+    this.parts.hatAxis = crownAxis
   }
 
   buildArmsAndWand() {
