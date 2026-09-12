@@ -300,6 +300,12 @@ html[data-quality='lite'] .lite-notice {
   backdrop-filter: blur(22px) saturate(112%);
 }
 
+html[data-journey-scroll='running'] .section-card,
+html[data-journey-scroll='running'] .hero-copy-panel,
+html[data-journey-scroll='running'] .dev-nav {
+  backdrop-filter: none;
+}
+
 /* ---------- Cake section ---------- */
 .cake-story-section {
   padding-inline: clamp(1.25rem, 4vw, 4rem);
@@ -307,7 +313,7 @@ html[data-quality='lite'] .lite-notice {
 
 .cake-copy-panel {
   width: min(520px, 44vw);
-  margin-right: auto;
+  margin-left: auto;
   background:
     radial-gradient(circle at 92% 8%, rgb(255 217 138 / 22%), transparent 28%),
     linear-gradient(145deg, rgb(255 253 249 / 91%), rgb(255 232 244 / 76%));
@@ -446,7 +452,6 @@ html[data-quality='lite'] .lite-notice {
   animation: none;
 }
 
-.cake-blow-button,
 .cake-mic-button {
   display: flex;
   width: 100%;
@@ -684,69 +689,66 @@ html[data-quality='lite'] .lite-notice {
   font-weight: 700;
 }
 
-.wish-flight-copy {
-  position: fixed;
-  z-index: 12;
-  top: 62%;
-  left: 30%;
-  max-width: min(18rem, 45vw);
-  padding: 0.45rem 0.7rem;
-  border-radius: 999px;
-  background: rgb(255 253 249 / 88%);
-  box-shadow: 0 10px 28px rgb(89 64 95 / 18%);
+.wish-form {
+  position: relative;
+}
+
+.wish-dissolve-copy {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 5rem;
+  overflow: hidden;
+  padding: 0.75rem 0.8rem;
+  border: 1px solid rgb(255 217 138 / 36%);
+  border-radius: 0.85rem;
+  background: rgb(255 253 249 / 86%);
   color: var(--pink-strong);
   font-family: var(--font-handwriting);
-  font-size: 1rem;
-  pointer-events: none;
-  animation: wish-copy-flight 1.45s cubic-bezier(0.22, 0.75, 0.25, 1) forwards;
-}
-
-@keyframes wish-copy-flight {
-  0% { opacity: 0; transform: translate(0, 1rem) scale(0.8); }
-  18% { opacity: 1; }
-  100% { opacity: 0; transform: translate(42vw, -48vh) scale(0.18) rotate(-8deg); }
-}
-
-.cake-blow-button > span:last-child {
-  display: grid;
-  gap: 0.05rem;
-}
-
-.cake-blow-button strong {
-  font-size: 0.78rem;
-}
-
-.cake-blow-button small {
-  color: rgb(255 253 249 / 66%);
-  font-size: 0.58rem;
-}
-
-.cake-blow-icon {
-  display: grid;
-  flex: 0 0 auto;
-  width: 2.15rem;
-  aspect-ratio: 1;
-  place-items: center;
-  border-radius: 50%;
-  background: linear-gradient(145deg, var(--gold), #f4b8d4);
-  box-shadow: 0 0 1.2rem rgb(255 217 138 / 30%);
-  color: #6b4b70;
   font-size: 1.15rem;
+  line-height: 1.35;
+  pointer-events: none;
+  transform-origin: 50% 45%;
+  animation: wish-copy-dissolve 1.79s ease-out forwards;
 }
 
-.cake-blow-button:hover:not(:disabled),
+@keyframes wish-copy-dissolve {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    letter-spacing: 0;
+    transform: scale(1);
+  }
+  28% {
+    opacity: 0.82;
+    color: var(--gold-deep);
+  }
+  72% {
+    opacity: 0.24;
+    filter: blur(2px);
+    letter-spacing: 0.14em;
+    transform: scale(1.035);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(5px);
+    letter-spacing: 0.24em;
+    transform: scale(0.92);
+  }
+}
+
 .cake-mic-button:hover:not(:disabled) {
   box-shadow: 0 16px 34px rgb(89 64 95 / 26%);
   transform: translateY(-2px);
 }
 
-.cake-blow-button:focus-visible,
 .cake-mic-button:focus-visible {
   outline: 3px solid var(--gold);
   outline-offset: 3px;
 }
 
-.cake-blow-button:disabled,
 .cake-mic-button:disabled {
   cursor: default;
   opacity: 0.72;
@@ -786,67 +788,6 @@ html[data-quality='lite'] .lite-notice {
 .cake-reset-button:disabled {
   cursor: wait;
   opacity: 0.55;
-}
-
-.cake-celebration-fallback {
-  position: absolute;
-  inset: -1rem;
-  display: none;
-  overflow: hidden;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-html[data-webgl='unavailable'] .cake-celebration-fallback {
-  display: block;
-}
-
-.cake-celebration-fallback i {
-  --confetti-x: 50%;
-  --confetti-delay: 0s;
-  position: absolute;
-  top: 8%;
-  left: var(--confetti-x);
-  width: 0.45rem;
-  height: 0.22rem;
-  background: var(--pink-strong);
-  animation: fallback-confetti 1.8s var(--confetti-delay) ease-out both;
-}
-
-.cake-celebration-fallback i:nth-child(3n) { background: var(--gold); transform: rotate(28deg); }
-.cake-celebration-fallback i:nth-child(3n + 1) { background: var(--lavender); transform: rotate(-24deg); }
-.cake-celebration-fallback i:nth-child(1) { --confetti-x: 8%; }
-.cake-celebration-fallback i:nth-child(2) { --confetti-x: 16%; --confetti-delay: 0.08s; }
-.cake-celebration-fallback i:nth-child(3) { --confetti-x: 24%; --confetti-delay: 0.16s; }
-.cake-celebration-fallback i:nth-child(4) { --confetti-x: 32%; --confetti-delay: 0.04s; }
-.cake-celebration-fallback i:nth-child(5) { --confetti-x: 40%; --confetti-delay: 0.2s; }
-.cake-celebration-fallback i:nth-child(6) { --confetti-x: 48%; --confetti-delay: 0.12s; }
-.cake-celebration-fallback i:nth-child(7) { --confetti-x: 56%; --confetti-delay: 0.24s; }
-.cake-celebration-fallback i:nth-child(8) { --confetti-x: 64%; --confetti-delay: 0.06s; }
-.cake-celebration-fallback i:nth-child(9) { --confetti-x: 72%; --confetti-delay: 0.18s; }
-.cake-celebration-fallback i:nth-child(10) { --confetti-x: 80%; --confetti-delay: 0.1s; }
-.cake-celebration-fallback i:nth-child(11) { --confetti-x: 88%; --confetti-delay: 0.22s; }
-.cake-celebration-fallback i:nth-child(n + 12) { top: 18%; }
-
-.cake-celebration-fallback > span {
-  position: absolute;
-  top: 8%;
-  right: 8%;
-  color: var(--gold-deep);
-  font-size: 2rem;
-  animation: fallback-celebration-star 1.5s ease-out both;
-}
-
-@keyframes fallback-confetti {
-  0% { opacity: 0; translate: 0 -1rem; }
-  18% { opacity: 1; }
-  100% { opacity: 0; translate: 0 22rem; rotate: 280deg; }
-}
-
-@keyframes fallback-celebration-star {
-  0% { opacity: 0; scale: 0.2; rotate: -25deg; }
-  35% { opacity: 1; scale: 1.2; }
-  100% { opacity: 0.7; scale: 1; rotate: 12deg; }
 }
 
 /* ---------- Hero overlay ---------- */
@@ -2357,7 +2298,7 @@ h1 {
   aspect-ratio: 1;
 }
 
-@media (min-width: 1100px) and (max-height: 980px) {
+@media (min-width: 900px) and (max-height: 980px) {
   .cake-story-section {
     min-height: 100svh;
     padding-block: 4.75rem 1.5rem;
@@ -2406,8 +2347,7 @@ h1 {
   .cake-controls > .wish-input-shell,
   .cake-controls > .cake-status,
   .cake-controls > .cake-mic-fallback,
-  .cake-controls > .cake-reset-button,
-  .cake-controls > .cake-celebration-fallback {
+  .cake-controls > .cake-reset-button {
     grid-column: 1 / -1;
   }
 
@@ -2450,7 +2390,6 @@ h1 {
     padding: 0.45rem 0.65rem;
   }
 
-  .cake-blow-button,
   .cake-mic-button {
     min-height: 3rem;
     gap: 0.55rem;
@@ -2458,7 +2397,6 @@ h1 {
     border-radius: 0.85rem;
   }
 
-  .cake-blow-icon,
   .cake-mic-icon {
     width: 1.85rem;
   }
@@ -2471,6 +2409,9 @@ h1 {
     min-height: 2.75rem;
   }
 
+}
+
+@media (min-width: 1100px) and (max-height: 980px) {
   .letter-story-section {
     min-height: 100svh;
     padding-block: 4.75rem 1.5rem;
@@ -2812,17 +2753,14 @@ h1 {
     animation: none;
   }
 
-  .cake-blow-button,
   .cake-mic-button,
   .cake-mic-meter i,
   .wish-form textarea {
     transition: none;
   }
 
-  .wish-flight-copy,
-  .cake-celebration-fallback i,
-  .cake-celebration-fallback > span {
-    animation-duration: 0.25s;
+  .wish-dissolve-copy {
+    animation-duration: 0.6s;
   }
 
   .cake-reset-button {

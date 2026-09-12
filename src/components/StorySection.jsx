@@ -1,3 +1,4 @@
+import { CakeVisualStage } from './CakeVisualStage.jsx'
 import { HeroOverlay } from './HeroOverlay.jsx'
 import { CakeControls } from './CakeControls.jsx'
 import { LetterControls } from './LetterControls.jsx'
@@ -54,17 +55,24 @@ export function StorySection({ index, recipient, relationship, section }) {
       data-scene={section.sceneModule}
       tabIndex="-1"
     >
+      {section.id === 'cake' && <CakeVisualStage copy={section.cakeCopy} />}
       <div className={cardClassName}>
-        <div className="section-heading">
-          <span className="section-number">0{index}</span>
-          <span className="section-icon" aria-hidden="true">
-            {section.icon}
-          </span>
-        </div>
+        {section.id === 'cake' ? (
+          <h1 className="cake-card-title">{section.title}</h1>
+        ) : (
+          <>
+            <div className="section-heading">
+              <span className="section-number">0{index}</span>
+              <span className="section-icon" aria-hidden="true">
+                {section.icon}
+              </span>
+            </div>
 
-        <p className="eyebrow">{section.eyebrow}</p>
-        <h1>{section.title.replace('{recipient}', recipient.displayName)}</h1>
-        <p className="section-description">{section.description}</p>
+            <p className="eyebrow">{section.eyebrow}</p>
+            <h1>{section.title.replace('{recipient}', recipient.displayName)}</h1>
+            <p className="section-description">{section.description}</p>
+          </>
+        )}
 
         {section.id === 'letter' && (
           <LetterControls
@@ -75,7 +83,7 @@ export function StorySection({ index, recipient, relationship, section }) {
         {section.id === 'gallery' && <GalleryPreview itemCount={section.items.length} />}
         {section.id === 'cake' && <CakeControls copy={section.cakeCopy} />}
 
-        <p className="phase-note">{section.phaseNote}</p>
+        {section.id !== 'cake' && <p className="phase-note">{section.phaseNote}</p>}
       </div>
     </section>
   )

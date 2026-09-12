@@ -44,6 +44,7 @@ export function WishInput({
         <p id={`${descriptionId}-hint`}>{copy.hint}</p>
         <textarea
           aria-describedby={`${descriptionId}-hint ${descriptionId}-status`}
+          data-journey-anchor="wish-source"
           disabled={isPrepared}
           id={descriptionId}
           maxLength={copy.maxLength}
@@ -52,6 +53,15 @@ export function WishInput({
           rows="3"
           value={value}
         />
+        {showFlight && (
+          <span
+            className="wish-dissolve-copy"
+            aria-hidden="true"
+            onAnimationEnd={onFlightComplete}
+          >
+            {value}
+          </span>
+        )}
         <div className="wish-form-footer">
           <span className="wish-character-count" aria-label={`${remainingCharacters} ${copy.charactersRemainingLabel}`}>
             {remainingCharacters}/{copy.maxLength}
@@ -65,15 +75,6 @@ export function WishInput({
       <p className="wish-form-status" id={`${descriptionId}-status`} role="status">
         {statusMessage}
       </p>
-      {showFlight && (
-        <span
-          className="wish-flight-copy"
-          aria-hidden="true"
-          onAnimationEnd={onFlightComplete}
-        >
-          {value}
-        </span>
-      )}
     </div>
   )
 }

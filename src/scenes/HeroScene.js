@@ -1,3 +1,4 @@
+import { JOURNEY_ANCHOR_IDS } from '../core/JourneyAnchorRegistry.js'
 import {
   AmbientLight,
   BackSide,
@@ -14,7 +15,10 @@ import {
 } from 'three'
 import { MagicTrail } from '../core/MagicTrail.js'
 import { ParticleSystem } from '../core/ParticleSystem.js'
+import { ShootingStarTrail } from '../core/ShootingStarTrail.js'
 import { FairyMascot } from './FairyMascot.js'
+import { HeroCompanions } from './HeroCompanions.js'
+import { HeroDecorations } from './HeroDecorations.js'
 
 const skyVertexShader = /* glsl */ `
   varying vec3 vDirection;
@@ -74,10 +78,25 @@ const haloFragmentShader = /* glsl */ `
   }
 `
 
+// Conservative per-frame submission ceilings, including transparent double-sided passes.
+// Geometry is resident in both modes; Lite reduces particles and visible companions.
+export const HERO_RESOURCE_BUDGET = Object.freeze({
+  geometries: 61,
+  drawCalls: 80,
+  particles: Object.freeze({ full: 1526, lite: 466 }),
+})
+
 export class HeroScene {
   constructor() {
     this.group = new Group()
     this.group.name = 'shared-hero-environment'
+    this.depthLayers = Object.fromEntries(['far', 'middle', 'near'].map((name) => {
+      const layer = new Group()
+      layer.name = `hero-depth-${name}`
+      this.group.add(layer)
+      return [name, layer]
+    }))
+    this.viewport = { width: 1440, height: 900 }
     this.elapsedSeconds = 0
     this.context = null
     this.baseMascotPosition = new Vector3()
@@ -88,13 +107,18 @@ export class HeroScene {
     this.scrollProgress = 0
     this.scrollTarget = 0
     this.trailEmissionTimer = 0
+    this.wandStar = null
+    this.anchorDisposers = []
     this.trailPosition = new Vector3()
     this.wandWorldPosition = new Vector3()
     this.isActive = true
     this.qualityMode = 'full'
     this.mascot = null
     this.mascotHalo = null
+    this.companionStory = null
+    this.staticDecorations = null
     this.magicTrail = null
+    this.shootingStar = null
     this.starField = null
     this.sky = null
     this.handlePointerLeave = this.handlePointerLeave.bind(this)
@@ -119,7 +143,7 @@ export class HeroScene {
 
     this.sky = new Mesh(skyGeometry, skyMaterial)
     this.sky.name = 'pink-lavender-gradient-sky'
-    this.group.add(this.sky)
+    this.depthLayers.far.add(this.sky)
 
     this.starField = new ParticleSystem({
       colorA: 0xfffbff,
@@ -130,7 +154,7 @@ export class HeroScene {
       seed: 1_111,
     })
     this.starField.points.name = 'shared-star-particles'
-    this.group.add(this.starField.points)
+    this.depthLayers.far.add(this.starField.points)
 
     const hemisphereLight = new HemisphereLight(0xfff3fc, 0x9d729d, 1.55)
     hemisphereLight.name = 'shared-hemisphere-light'
@@ -159,24 +183,42 @@ export class HeroScene {
     this.mascotHalo.name = 'fairy-mascot-halo'
     this.mascotHalo.position.set(0, 0.48, -0.55)
     this.mascotHalo.renderOrder = -10
+    this.wandStar = this.mascot.parts.wand.getObjectByName('fairy-wand-star')
+    if (context.journeyAnchors) {
+      this.anchorDisposers = [
+        context.journeyAnchors.registerWorldAnchor(
+          JOURNEY_ANCHOR_IDS.HERO_WAND_TIP,
+          (target) => this.getWandWorldPosition(target),
+        ),
+      ]
+    }
     this.mascot.group.add(this.mascotHalo)
-    this.group.add(this.mascot.group)
+    this.depthLayers.middle.add(this.mascot.group)
+    this.staticDecorations = new HeroDecorations({ qualityMode: context.qualityMode })
+    this.depthLayers.near.add(this.staticDecorations.group)
+    this.companionStory = new HeroCompanions({ qualityMode: context.qualityMode })
+    this.depthLayers.middle.add(this.companionStory.group)
     this.magicTrail = new MagicTrail({ qualityMode: context.qualityMode })
-    this.group.add(this.magicTrail.points)
+    this.depthLayers.near.add(this.magicTrail.points)
+    this.shootingStar = new ShootingStarTrail({ qualityMode: context.qualityMode })
+    this.depthLayers.far.add(this.shootingStar.points)
     context.scene.add(this.group)
     this.resize()
 
     if (typeof window !== 'undefined') {
       window.addEventListener('pointermove', this.handlePointerMove, { passive: true })
       window.addEventListener('pointerleave', this.handlePointerLeave)
+      window.addEventListener('blur', this.handlePointerLeave)
+      document.documentElement.addEventListener('pointerleave', this.handlePointerLeave)
+      document.addEventListener('visibilitychange', this.handlePointerLeave)
     }
   }
 
   handlePointerMove(event) {
-    if (!this.isActive || typeof window === 'undefined') return
+    if (!this.isActive || this.context?.reducedMotion || event.pointerType === 'touch' || typeof window === 'undefined') return
 
-    const nextX = event.clientX / Math.max(1, window.innerWidth) * 2 - 1
-    const nextY = 1 - event.clientY / Math.max(1, window.innerHeight) * 2
+    const nextX = Math.max(-1, Math.min(1, event.clientX / Math.max(1, window.innerWidth) * 2 - 1))
+    const nextY = Math.max(-1, Math.min(1, 1 - event.clientY / Math.max(1, window.innerHeight) * 2))
     const movement = Math.hypot(nextX - this.pointerTarget.x, nextY - this.pointerTarget.y)
 
     this.pointerTarget.set(nextX, nextY)
@@ -185,8 +227,39 @@ export class HeroScene {
 
   handlePointerLeave() {
     this.pointerTarget.set(0, 0)
+    this.pointerEnergy = 0
+    if (typeof document !== 'undefined' && document.hidden) this.resetParallax()
   }
 
+  resetParallax() {
+    this.pointerTarget.set(0, 0)
+    this.currentPointer.set(0, 0)
+    this.pointerEnergy = 0
+    Object.values(this.depthLayers).forEach((layer) => layer.position.set(0, 0, 0))
+  }
+
+  updateParallax(reducedMotion) {
+    if (reducedMotion) {
+      this.resetParallax()
+      return
+    }
+    // Pixel caps preserve the existing safe composition, including compact viewports.
+    const camera = this.context.camera
+    const worldPerPixel = camera
+      ? 2 * Math.tan(camera.fov * Math.PI / 360) * Math.max(1, camera.position.z - 0.5) / this.viewport.height
+      : 0.004
+    const strength = (1 - this.scrollProgress * 0.65) * (this.qualityMode === 'lite' ? 0.7 : 1)
+    const compact = this.viewport.width < 700 ? 0.45 : 1
+    for (const [name, pixels] of Object.entries({ far: 2, middle: 6, near: 10 })) {
+      const offset = pixels * worldPerPixel * strength * compact
+      this.depthLayers[name].position.set(this.currentPointer.x * offset, this.currentPointer.y * offset * 0.65, 0)
+    }
+  }
+
+  getWandWorldPosition(target = new Vector3()) {
+    if (!this.wandStar) return null
+    return this.wandStar.getWorldPosition(target)
+  }
   setScrollProgress(progress) {
     const nextProgress = Math.max(0, Math.min(1, progress))
     const movement = Math.abs(nextProgress - this.scrollTarget)
@@ -196,19 +269,26 @@ export class HeroScene {
 
   setActive(isActive) {
     this.isActive = Boolean(isActive)
+    if (!this.isActive) this.resetParallax()
     this.group.visible = this.isActive
     if (this.mascot) this.mascot.group.visible = this.isActive
     if (this.magicTrail) this.magicTrail.points.visible = this.isActive
+    this.companionStory?.setActive(this.isActive)
+    this.shootingStar?.setActive(this.isActive)
   }
 
   resize({ height = 900, width = 1_440 } = {}) {
+    this.viewport = { height, width }
     if (!this.context || !this.starField) {
       return
     }
 
     this.starField.setPixelRatio(this.context.renderer.getPixelRatio())
     this.magicTrail?.setPixelRatio(this.context.renderer.getPixelRatio())
+    this.shootingStar?.setPixelRatio(this.context.renderer.getPixelRatio())
 
+    this.staticDecorations?.resize({ height, width })
+    this.companionStory?.resize({ height, width })
     if (!this.mascot) {
       return
     }
@@ -231,19 +311,26 @@ export class HeroScene {
     this.qualityMode = nextMode
     this.starField?.setQualityMode(nextMode)
     this.magicTrail?.setQualityMode(nextMode)
-    this.resize()
+    this.shootingStar?.setQualityMode(nextMode)
+    this.companionStory?.setQualityMode(nextMode)
+    this.resize(this.viewport)
+    this.staticDecorations?.setQualityMode(nextMode)
   }
 
   update({ delta, reducedMotion }) {
+    if (!this.isActive) return
     this.elapsedSeconds += delta
     this.starField?.update({ elapsedSeconds: this.elapsedSeconds, reducedMotion })
     this.magicTrail?.update(delta)
+    this.staticDecorations?.update({ elapsedSeconds: this.elapsedSeconds, reducedMotion })
+    this.shootingStar?.update(delta, { reducedMotion })
 
     if (!this.mascot || !this.isActive) return
 
     const smoothing = 1 - Math.exp(-delta * 5)
     this.currentPointer.lerp(this.pointerTarget, smoothing)
     this.scrollProgress += (this.scrollTarget - this.scrollProgress) * smoothing
+    this.updateParallax(reducedMotion)
     this.pointerEnergy = Math.max(0, this.pointerEnergy - delta * 1.7)
     this.scrollEnergy = Math.max(0, this.scrollEnergy - delta * 1.4)
 
@@ -251,17 +338,28 @@ export class HeroScene {
       this.mascot.group.position.copy(this.baseMascotPosition)
       this.mascot.group.position.y += this.scrollProgress * 0.06
       this.mascot.group.rotation.set(0, -0.08, 0)
+      if (this.wandStar) this.wandStar.scale.setScalar(1)
+      this.companionStory?.update({
+        elapsedSeconds: this.elapsedSeconds,
+        reducedMotion: true,
+      })
       return
     }
 
     const time = this.elapsedSeconds
     const scrollArc = Math.sin(this.scrollProgress * Math.PI)
+    const gestureDuration = 1.8
+    const gestureTime = (time + 0.45) % 7.2
+    const gestureProgress = Math.max(0, Math.min(1, gestureTime / gestureDuration))
+    const gestureEnvelope = gestureTime <= gestureDuration
+      ? Math.sin(gestureProgress * Math.PI) ** 2
+      : 0
     const bob = Math.sin(time * 1.15) * 0.07
 
     this.mascot.group.position.set(
-      this.baseMascotPosition.x + this.currentPointer.x * 0.11 + Math.sin(time * 0.38) * 0.025,
-      this.baseMascotPosition.y + bob + this.currentPointer.y * 0.075 + scrollArc * 0.12,
-      this.baseMascotPosition.z + this.currentPointer.x * 0.035,
+      this.baseMascotPosition.x + Math.sin(time * 0.38) * 0.025,
+      this.baseMascotPosition.y + bob + scrollArc * 0.12,
+      this.baseMascotPosition.z,
     )
     this.mascot.group.rotation.y = -0.08 + this.currentPointer.x * 0.1
     this.mascot.group.rotation.x = -this.currentPointer.y * 0.025
@@ -274,37 +372,59 @@ export class HeroScene {
       wing.rotation.z = wing.userData.restRotationZ + wingBeat * direction * strength
     })
 
-    const wandWave = Math.sin(time * 2.1) * 0.055 + Math.sin(this.scrollProgress * Math.PI * 2) * 0.16
+    const wandWave = Math.sin(gestureProgress * Math.PI * 2) * gestureEnvelope * 0.34 + Math.sin(this.scrollProgress * Math.PI * 2) * 0.11
     this.mascot.parts.wandArm.rotation.z = wandWave + this.currentPointer.y * 0.055
-    this.mascot.parts.wand.rotation.z = -0.07 + Math.sin(time * 2.7) * 0.045
+    this.mascot.parts.wand.rotation.z = -0.07 + Math.sin(gestureProgress * Math.PI * 2 + 0.5) * gestureEnvelope * 0.11
+    // Nghiêng nhẹ theo x/y để đầu đũa không luôn phẳng đối diện camera,
+    // tự nhiên hơn khi phối với MagicTrail phát ra từ fairy-wand-star.
+    this.mascot.parts.wand.rotation.x = Math.sin(gestureProgress * Math.PI) * gestureEnvelope * 0.08 + this.currentPointer.y * 0.04
+    this.mascot.parts.wand.rotation.y = Math.cos(gestureProgress * Math.PI * 2) * gestureEnvelope * 0.07 + this.currentPointer.x * 0.05
+    if (this.wandStar) this.wandStar.scale.setScalar(1 + gestureEnvelope * 0.38)
+
+    this.companionStory?.update({
+      elapsedSeconds: this.elapsedSeconds,
+      reducedMotion: false,
+    })
+
 
     this.trailEmissionTimer -= delta
-    if (this.trailEmissionTimer <= 0) {
-      const wandStar = this.mascot.parts.wand.getObjectByName('fairy-wand-star')
+    if (gestureEnvelope > 0.14 && this.trailEmissionTimer <= 0) {
+      const wandStar = this.wandStar
       this.group.updateWorldMatrix(true, true)
       wandStar.getWorldPosition(this.wandWorldPosition)
       this.trailPosition.copy(this.wandWorldPosition)
-      this.group.worldToLocal(this.trailPosition)
+      this.magicTrail.points.worldToLocal(this.trailPosition)
 
-      const motionEnergy = Math.max(0.18, this.pointerEnergy, this.scrollEnergy)
-      this.magicTrail.emit(this.trailPosition, motionEnergy)
-      this.trailEmissionTimer = this.qualityMode === 'lite' ? 0.075 : 0.04
+      const motionEnergy = Math.max(0.68 + gestureEnvelope * 0.32, this.pointerEnergy, this.scrollEnergy)
+      this.magicTrail.emit(this.trailPosition, motionEnergy, { cascade: true })
+      this.trailEmissionTimer = this.qualityMode === 'lite' ? 0.1 : 0.055
+    } else if (gestureEnvelope <= 0.14) {
+      this.trailEmissionTimer = 0
     }
   }
 
   dispose() {
+    this.anchorDisposers.forEach((disposeAnchor) => disposeAnchor())
+    this.anchorDisposers = []
     this.group.parent?.remove(this.group)
     this.starField?.dispose()
     this.magicTrail?.dispose()
     this.mascot?.dispose()
+    this.staticDecorations?.dispose()
+    this.companionStory?.dispose()
+    this.shootingStar?.dispose()
     this.sky?.geometry.dispose()
     this.sky?.material.dispose()
     this.group.clear()
+    this.wandStar = null
     this.context = null
 
     if (typeof window !== 'undefined') {
       window.removeEventListener('pointermove', this.handlePointerMove)
       window.removeEventListener('pointerleave', this.handlePointerLeave)
+      window.removeEventListener('blur', this.handlePointerLeave)
+      document.documentElement.removeEventListener('pointerleave', this.handlePointerLeave)
+      document.removeEventListener('visibilitychange', this.handlePointerLeave)
     }
   }
 }

@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict'
+import { writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
-/* global document, getComputedStyle, innerHeight, innerWidth, requestAnimationFrame */
+/* global PointerEvent, document, getComputedStyle, innerHeight, innerWidth, requestAnimationFrame */
 
 const port = Number(process.argv[2])
 const expectedWidth = Number(process.argv[3])
@@ -57,7 +60,10 @@ function request(method, params = {}) {
 
 async function evaluate(expression, awaitPromise = false) {
   const response = await request('Runtime.evaluate', { awaitPromise, expression, returnByValue: true })
-  if (response.result?.exceptionDetails) throw new Error(response.result.exceptionDetails.text)
+  if (response.result?.exceptionDetails) {
+    const details = response.result.exceptionDetails
+    throw new Error(details.exception?.description ?? details.text)
+  }
   return response.result?.result?.value
 }
 
@@ -103,7 +109,11 @@ const result = await evaluate(`(${(() => {
     legacyCount: document.querySelectorAll('.hero-stats, .hero-milestone, .hero-cta, .hero-footer').length,
     loveLabel: document.querySelector('.hero-love-loop').getAttribute('aria-label'),
     loveFontSize: Number.parseFloat(loveStyle.fontSize),
-    milestoneCopyPresent: panel.textContent.includes('1.111 ngày được bên em bé') && panel.textContent.includes('16.9.2026'),
+    milestoneCopyPresent: panel.textContent.includes('1.111 ngày được bên em bé'),
+    garlandCount: document.querySelectorAll('.hero-birthday-garland').length,
+    fallbackBouquetCount: document.querySelectorAll('.hero-fallback-bouquet').length,
+    fallbackDecorAriaHidden: document.querySelector('.hero-fallback-static-decor').getAttribute('aria-hidden'),
+    fallbackBalloonCount: document.querySelectorAll('.hero-fallback-balloon').length,
     nameText: name.textContent,
     oldCopyPresent: panel.textContent.includes('Tuổi mới') || panel.textContent.includes('Bắt đầu hành trình'),
     panelRect: { bottom: panelRect.bottom, height: panelRect.height, left: panelRect.left, right: panelRect.right, top: panelRect.top, width: panelRect.width },
@@ -111,6 +121,7 @@ const result = await evaluate(`(${(() => {
     tagText: document.querySelector('.hero-date-chip').textContent.replace(/\s+/g, ' ').trim(),
     sparkleAnimationName: sparkleStyle.animationName,
     sparkleAriaHidden: sparkle.getAttribute('aria-hidden'),
+    speechCount: document.querySelectorAll('.hero-mascot-speech').length,
     titleInside: titleRect.left >= panelRect.left - 1 && titleRect.right <= panelRect.right + 1,
     titleText: title.textContent.trim(),
     viewport: { height: innerHeight, width: innerWidth },
@@ -123,7 +134,12 @@ const fps = await evaluate(`(${(() => new Promise((resolve) => {
   const startedAt = performance.now()
   function tick(now) {
     frames += 1
-    if (now - startedAt >= 2_000) {
+    document.documentElement.dispatchEvent(new PointerEvent('pointermove', {
+      bubbles: true, pointerType: 'mouse',
+      clientX: (Math.sin((now - startedAt) / 500) + 1) * innerWidth / 2,
+      clientY: (Math.cos((now - startedAt) / 700) + 1) * innerHeight / 2,
+    }))
+    if (now - startedAt >= 8_000) {
       resolve(Math.round(frames * 1_000 / (now - startedAt)))
       return
     }
@@ -137,9 +153,14 @@ assert.equal(result.tagText.includes('Ngày của em bé'), true)
 assert.equal(result.tagText.includes('17.9.2026'), true)
 assert.equal(result.loveLabel, 'I love u so much and be always only you.')
 assert.equal(result.milestoneCopyPresent, true)
+assert.equal(result.garlandCount, 0)
+assert.equal(result.fallbackBouquetCount, 0)
+assert.equal(result.fallbackDecorAriaHidden, 'true')
+assert.equal(result.fallbackBalloonCount, 4)
 assert.equal(result.nameText, 'Hiền Lương')
 assert.equal(result.heartContent.includes('♥'), true)
 assert.equal(result.sparkleAriaHidden, 'true')
+assert.equal(result.speechCount, 0)
 assert.deepEqual(result.directChildren, ['hero-date-chip', 'hero-script-title', 'hero-storyline'])
 assert.equal(result.legacyCount, 0)
 assert.equal(result.oldCopyPresent, false)
@@ -158,5 +179,8 @@ assert.ok(result.loveFontSize > (expectedWidth < 700 ? 28 : 30))
 assert.ok(fps >= 30, `Hero dropped below 30 FPS: ${fps}`)
 assert.deepEqual(consoleErrors, [])
 
+const screenshot = await request('Page.captureScreenshot', { format: 'png' })
+await writeFile(join(tmpdir(), `twinkle-r310-${port}.png`), Buffer.from(screenshot.result.data, 'base64'))
+await evaluate("document.documentElement.dispatchEvent(new PointerEvent('pointerleave'))")
 socket.close()
 console.log(JSON.stringify({ fps, motion: expectedMotion, ...result }))

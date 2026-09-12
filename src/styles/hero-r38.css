@@ -1,0 +1,24 @@
+/* R3.8: restrained, out-of-phase balloon motion only. */
+
+html[data-webgl='unavailable'] .hero-fallback-balloon-1 { animation: hero-balloon-sway-a 7.8s ease-in-out infinite; }
+html[data-webgl='unavailable'] .hero-fallback-balloon-2 { animation: hero-balloon-sway-b 8.9s ease-in-out -2.1s infinite; }
+html[data-webgl='unavailable'] .hero-fallback-balloon-3 { animation: hero-balloon-sway-a 9.6s ease-in-out -4.4s infinite; }
+html[data-webgl='unavailable'] .hero-fallback-balloon-4 { animation: hero-balloon-sway-b 8.2s ease-in-out -1.3s infinite; }
+
+@keyframes hero-balloon-sway-a {
+  0%, 100% { translate: 0 0; rotate: -0.5deg; }
+  50% { translate: 2px -3px; rotate: 0.7deg; }
+}
+
+@keyframes hero-balloon-sway-b {
+  0%, 100% { translate: 0 0; rotate: 0.6deg; }
+  50% { translate: -2px -2px; rotate: -0.5deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-webgl='unavailable'] .hero-fallback-balloon {
+    animation: none;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+}

@@ -11,6 +11,7 @@ import {
   applyRuntimeAttributes,
   detectRuntimeCapabilities,
 } from './core/runtimeCapabilities.js'
+import { CAKE_WISH_JOURNEY_EVENT } from './scenes/cakeEvents.js'
 
 function App() {
   const requestedSection = getRequestedSection(birthdayContent.sections)
@@ -39,6 +40,24 @@ function App() {
 
   const handleExperienceStageChange = useCallback((stage) => {
     setIntroActive(stage !== 'hero-reveal' && stage !== 'complete')
+  }, [])
+
+  useEffect(() => {
+    function handleWishJourney({ detail }) {
+      if (detail?.stage === 'topper-to-wand') {
+        sceneManagerRef.current?.setJourneyTransitionActive(true)
+        sectionManagerRef.current?.startAutoScrollToSection('hero', {
+          durationMs: detail.durationMs,
+        })
+        return
+      }
+      if (detail?.stage === 'complete' || detail?.stage === 'idle') {
+        sceneManagerRef.current?.setJourneyTransitionActive(false)
+      }
+    }
+
+    window.addEventListener(CAKE_WISH_JOURNEY_EVENT, handleWishJourney)
+    return () => window.removeEventListener(CAKE_WISH_JOURNEY_EVENT, handleWishJourney)
   }, [])
 
   useEffect(() => {

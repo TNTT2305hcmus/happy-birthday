@@ -1,3 +1,4 @@
+import { JourneyAnchorRegistry } from './JourneyAnchorRegistry.js'
 import {
   PerspectiveCamera,
   Scene,
@@ -32,10 +33,13 @@ export class SceneManager {
     this.sceneModules = new Map()
     this.activeSectionIds = new Set()
     this.sectionProgress = {}
+    this.scenePresence = {}
     this.animationFrameId = null
     this.lastFrameTime = null
     this.isRunning = false
     this.isDisposed = false
+    this.journeyTransitionActive = false
+    this.journeyAnchors = new JourneyAnchorRegistry({ camera: this.camera, canvas: this.canvas })
 
     const profile = QUALITY_PROFILES[this.qualityMode]
     this.renderer = new WebGLRenderer({
@@ -70,6 +74,7 @@ export class SceneManager {
 
     const context = {
       camera: this.camera,
+      journeyAnchors: this.journeyAnchors,
       qualityMode: this.qualityMode,
       reducedMotion: this.reducedMotion,
       renderer: this.renderer,
@@ -80,7 +85,9 @@ export class SceneManager {
     this.sceneModules.set(sceneModule, { sectionId })
     if (sectionId) {
       sceneModule.setScrollProgress?.(this.sectionProgress[sectionId] ?? 0)
-      sceneModule.setActive?.(this.activeSectionIds.has(sectionId))
+      const isActive = this.activeSectionIds.has(sectionId)
+      sceneModule.setActive?.(isActive)
+      sceneModule.setRevealProgress?.(this.scenePresence[sectionId] ?? Number(isActive))
     }
     sceneModule.resize?.({
       height: Math.max(1, window.innerHeight),
@@ -109,16 +116,31 @@ export class SceneManager {
     this.handleResize()
   }
 
-  setSectionSnapshot({ presentSectionIds = [], sectionProgress = {} } = {}) {
-    this.activeSectionIds = new Set(presentSectionIds)
+  setJourneyTransitionActive(isActive) {
+    const nextActive = Boolean(isActive)
+    if (this.journeyTransitionActive === nextActive || this.isDisposed) return
+    this.journeyTransitionActive = nextActive
+    this.canvas.dataset.journeyResolution = nextActive ? 'dynamic' : 'native'
+    this.handleResize()
+  }
+
+  setSectionSnapshot({
+    presentSectionIds = [],
+    scenePresence = {},
+    sceneSectionIds = presentSectionIds,
+    sectionProgress = {},
+  } = {}) {
+    this.activeSectionIds = new Set(sceneSectionIds)
+    this.scenePresence = scenePresence
     this.sectionProgress = sectionProgress
     this.sceneModules.forEach(({ sectionId }, sceneModule) => {
       if (!sectionId) return
-      sceneModule.setActive?.(this.activeSectionIds.has(sectionId))
+      const isActive = this.activeSectionIds.has(sectionId)
+      sceneModule.setActive?.(isActive)
+      sceneModule.setRevealProgress?.(scenePresence[sectionId] ?? Number(isActive))
       sceneModule.setScrollProgress?.(sectionProgress[sectionId] ?? 0)
     })
   }
-
   handleResize() {
     if (this.isDisposed) {
       return
@@ -127,7 +149,8 @@ export class SceneManager {
     const width = Math.max(1, window.innerWidth)
     const height = Math.max(1, window.innerHeight)
     const { maxPixelRatio } = QUALITY_PROFILES[this.qualityMode]
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, maxPixelRatio)
+    const journeyPixelRatio = this.journeyTransitionActive ? 1 : maxPixelRatio
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, journeyPixelRatio)
 
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
@@ -168,7 +191,10 @@ export class SceneManager {
 
     this.frameTasks.forEach((task) => task(frame))
     this.sceneModules.forEach(({ sectionId }, sceneModule) => {
-      if (!sectionId || this.activeSectionIds.has(sectionId)) sceneModule.update?.(frame)
+      const isSectionActive = !sectionId || this.activeSectionIds.has(sectionId)
+      if (isSectionActive || sceneModule.shouldUpdateWhenInactive?.()) {
+        sceneModule.update?.(frame)
+      }
     })
     this.renderer.render(this.scene, this.camera)
     this.animationFrameId = window.requestAnimationFrame(this.renderFrame)
@@ -204,6 +230,7 @@ export class SceneManager {
     this.frameTasks.clear()
     this.sceneModules.forEach((_, sceneModule) => sceneModule.dispose?.())
     this.sceneModules.clear()
+    this.journeyAnchors.dispose()
     window.removeEventListener('resize', this.handleResize)
     document.removeEventListener('visibilitychange', this.handleVisibilityChange)
     this.renderer.dispose()

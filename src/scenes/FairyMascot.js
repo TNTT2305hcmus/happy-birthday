@@ -16,6 +16,9 @@ import {
   Vector3,
 } from 'three'
 
+// Bán kính khớp nối dùng để che seam giữa capsule tay/chân và thân/hông.
+const JOINT_RADIUS = 0.075
+
 export const FAIRY_PALETTE = {
   blush: 0xf49ab7,
   cream: 0xfff9f3,
@@ -44,10 +47,10 @@ function createStarGeometry(outerRadius = 0.2, innerRadius = 0.09, depth = 0.055
   shape.closePath()
   return new ExtrudeGeometry(shape, {
     bevelEnabled: true,
-    bevelSegments: 1,
+    bevelSegments: 2,
     bevelSize: 0.018,
     bevelThickness: 0.014,
-    curveSegments: 1,
+    curveSegments: 3,
     depth,
   })
 }
@@ -61,10 +64,10 @@ function createWingGeometry() {
 
   return new ExtrudeGeometry(shape, {
     bevelEnabled: true,
-    bevelSegments: 1,
+    bevelSegments: 2,
     bevelSize: 0.012,
     bevelThickness: 0.01,
-    curveSegments: 4,
+    curveSegments: 8,
     depth: 0.025,
   })
 }
@@ -72,7 +75,7 @@ function createWingGeometry() {
 function createLimb({ end, material, name, radius = 0.065, start }) {
   const direction = new Vector3().subVectors(end, start)
   const length = direction.length()
-  const geometry = new CapsuleGeometry(radius, Math.max(0.01, length - radius * 2), 3, 8)
+  const geometry = new CapsuleGeometry(radius, Math.max(0.01, length - radius * 2), 4, 12)
   const limb = new Mesh(geometry, material)
 
   limb.name = name
@@ -103,6 +106,11 @@ function addNamedMesh(parent, geometry, material, name, position, scale) {
   return mesh
 }
 
+// Sphere nhỏ đặt tại điểm nối capsule (vai/hông) để che seam, đỡ cảm giác "lắp ghép".
+function addJoint(parent, position, material, name, radius = JOINT_RADIUS) {
+  return addNamedMesh(parent, new SphereGeometry(radius, 10, 7), material, name, position)
+}
+
 export class FairyMascot {
   constructor() {
     this.group = new Group()
@@ -122,7 +130,7 @@ export class FairyMascot {
     return {
       blush: createMaterial(FAIRY_PALETTE.blush, { roughness: 0.8 }),
       cream: createMaterial(FAIRY_PALETTE.cream),
-      eye: createMaterial(FAIRY_PALETTE.eye, { roughness: 0.38 }),
+      eye: createMaterial(FAIRY_PALETTE.eye, { roughness: 0.18 }),
       gold: createMaterial(FAIRY_PALETTE.gold, {
         emissive: FAIRY_PALETTE.gold,
         emissiveIntensity: 0.24,
@@ -133,6 +141,15 @@ export class FairyMascot {
       lavender: createMaterial(FAIRY_PALETTE.lavender, { roughness: 0.58 }),
       pink: createMaterial(FAIRY_PALETTE.pink, { roughness: 0.55 }),
       skin: createMaterial(FAIRY_PALETTE.skin, { roughness: 0.8 }),
+      // Mặt dùng riêng material mượt (không flatShading) + clearcoat nhẹ để da trông "polished"
+      skinFace: new MeshPhysicalMaterial({
+        clearcoat: 0.3,
+        clearcoatRoughness: 0.35,
+        color: FAIRY_PALETTE.skin,
+        flatShading: false,
+        metalness: 0,
+        roughness: 0.72,
+      }),
       white: createMaterial(FAIRY_PALETTE.white),
       wing: new MeshPhysicalMaterial({
         color: 0xf5eaff,
@@ -254,8 +271,8 @@ export class FairyMascot {
     )
     addNamedMesh(
       this.group,
-      new SphereGeometry(0.4, 12, 8),
-      this.materials.skin,
+      new SphereGeometry(0.4, 20, 16),
+      this.materials.skinFace,
       'fairy-face',
       [0, 1.05, 0.105],
       [0.96, 1, 0.91],
@@ -294,6 +311,14 @@ export class FairyMascot {
         [side * 0.25, 0.95, 0.425],
         [1.15, 0.48, 0.28],
       )
+      addNamedMesh(
+        this.group,
+        new SphereGeometry(0.028, 6, 4),
+        this.materials.hair,
+        side < 0 ? 'fairy-eyebrow-left' : 'fairy-eyebrow-right',
+        [side * 0.145, 1.155, 0.465],
+        [1.9, 0.55, 0.5],
+      ).rotation.z = -side * 0.18
     })
 
     const smile = addNamedMesh(
@@ -346,7 +371,7 @@ export class FairyMascot {
       createStarGeometry(0.105, 0.048, 0.035),
       this.materials.gold,
       'fairy-hat-star',
-      [crownTip.x, crownTip.y, 0.02],
+      [crownTip.x, crownTip.y, crownTip.z],
     )
     hatStar.position.addScaledVector(crownAxis, 0.045)
     hatStar.rotation.z = crown.rotation.z
@@ -369,6 +394,9 @@ export class FairyMascot {
       start: new Vector3(0.28, 0.49, 0.04),
     })
     this.group.add(leftArm)
+
+    addJoint(this.group, [-0.28, 0.48, 0.04], this.materials.skin, 'fairy-shoulder-left')
+    addJoint(this.group, [0.28, 0.49, 0.04], this.materials.skin, 'fairy-shoulder-right')
 
     addNamedMesh(
       this.group,
@@ -425,6 +453,13 @@ export class FairyMascot {
         start: new Vector3(side * 0.13, -0.62, 0.01),
       })
       this.group.add(leg)
+      addJoint(
+        this.group,
+        [side * 0.13, -0.62, 0.01],
+        this.materials.skin,
+        side < 0 ? 'fairy-hip-left' : 'fairy-hip-right',
+        0.065,
+      )
       const shoe = addNamedMesh(
         this.group,
         new SphereGeometry(0.12, 8, 5),

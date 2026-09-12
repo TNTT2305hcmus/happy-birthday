@@ -85,7 +85,7 @@ await delay(100)
 const preparedResponse = await request('Runtime.evaluate', {
   expression: `JSON.stringify({
     blowDisabled: document.querySelector('.cake-blow-button')?.disabled,
-    flightAbsent: !document.querySelector('.wish-flight-copy'),
+    flightAbsent: !document.querySelector('.wish-dissolve-copy'),
     state: document.querySelector('.wish-input-shell')?.dataset.wishState,
     storedWish: localStorage.getItem('twinkle-birthday:wish')
   })`,
@@ -106,7 +106,7 @@ let initial = null
 for (let attempt = 0; attempt < 30; attempt += 1) {
   const response = await request('Runtime.evaluate', {
     expression: `JSON.stringify({
-      flightCopy: document.querySelector('.wish-flight-copy')?.textContent,
+      flightCopy: document.querySelector('.wish-dissolve-copy')?.textContent,
       state: document.querySelector('.wish-input-shell')?.dataset.wishState,
       status: document.querySelector('.cake-controls')?.dataset.cakeStatus
     })`,
@@ -145,7 +145,7 @@ assert.ok(fps >= 30, `Wish-to-star animation dropped below 30 FPS: ${fps}`)
 
 const finalState = await request('Runtime.evaluate', {
   expression: `JSON.stringify({
-    flightRemoved: !document.querySelector('.wish-flight-copy'),
+    flightRemoved: !document.querySelector('.wish-dissolve-copy'),
     status: document.querySelector('.wish-form-status')?.textContent,
     textareaDisabled: document.querySelector('.wish-form textarea')?.disabled
   })`,

@@ -321,36 +321,45 @@ kết thúc ở Hero duy nhất.
   - [x] Halo dùng đúng một draw call và đi cùng transform mascot; phép đo ổn định 2 giây trên Edge headless đạt
     54 FPS tại 1470×850, 60 FPS reduced-motion, 57 FPS mobile và 57 FPS fallback mobile; lint, build và
     regression 2.2–2.3 đạt.
-- [ ] R3.7 Làm đầy khoảng trống bên phải bằng một bộ trang trí tĩnh có giới hạn, nghiệm thu bố cục trước khi animate.
-  - [ ] Thêm garland “HAPPY BIRTHDAY” viết tay cong nhẹ phía trên mascot, treo bằng hai dây mảnh; chữ là nội dung
-    trang trí `aria-hidden`, không cạnh tranh với headline chính.
-  - [ ] Bố trí 3–4 bóng bay/lồng đèn tim với kích thước và độ sâu khác nhau trong khoảng card–mascot; không xếp đều,
+- [x] R3.7 Làm đầy khoảng trống bên phải bằng một bộ trang trí tĩnh có giới hạn, nghiệm thu bố cục trước khi animate.
+  - [x] Gỡ garland “HAPPY BIRTHDAY” theo feedback; giữ khoảng thở phía trên mascot cho phép thuật.
+  - [x] Bố trí 3–4 bóng bay/lồng đèn tim với kích thước và độ sâu khác nhau trong khoảng card–mascot; không xếp đều,
     không che mặt, đũa phép, headline hoặc love line.
-  - [ ] Thêm một cụm hoa/lá low-poly nhỏ dưới mascot để tạo cảm giác có mặt đất; ưu tiên geometry dùng chung,
-    không dùng texture/model ngoài và có thể tắt cả cụm trong Lite Mode.
-- [ ] R3.8 Thêm chuyển động phép thuật chính cho mascot và đũa phép.
-  - [ ] Tạo một idle gesture ngắn lặp chậm: mascot vẫy đũa, đầu đũa phát sparkle rồi rắc trail kim tuyến xuống;
+  - [x] Gỡ cụm hoa/lá low-poly dưới mascot và bản CSS fallback theo feedback; giữ chân mascot thoáng.
+  - [x] Nghiệm thu Edge headless đạt 57 FPS desktop Full, 60 FPS reduced motion, 57 FPS mobile và 43 FPS fallback
+    mobile; lint, production build, structural verify và browser regression đều đạt.
+- [x] R3.8 Thêm chuyển động phép thuật chính cho mascot và đũa phép.
+  - [x] Tạo một idle gesture ngắn lặp chậm: mascot vẫy đũa, đầu đũa phát sparkle rồi rắc trail kim tuyến xuống;
     trail rộng/dài hơn hiện tại nhưng phải dùng lại `MagicTrail`, có trần hạt Full/Lite và không phát liên tục dày đặc.
-  - [ ] Garland và bóng bay chỉ đung đưa lệch pha rất nhẹ; reduced motion giữ tĩnh, không thay bằng loop khác.
-  - [ ] Mỗi vài giây chỉ cho phép một shooting-star trail chạy chéo rồi mờ hẳn; tái sử dụng pool, tạm dừng khi Hero
+  - [x] Bóng bay đung đưa lệch pha rất nhẹ; reduced motion giữ tĩnh, không thay bằng loop khác.
+  - [x] Mỗi vài giây chỉ cho phép một shooting-star trail chạy chéo rồi mờ hẳn; tái sử dụng pool, tạm dừng khi Hero
     không active hoặc tab bị ẩn.
-- [ ] R3.9 Bổ sung nhân vật phụ để nửa phải có câu chuyện nhưng không tạo thêm một mascot chính cạnh tranh.
-  - [ ] Thêm một tiên nhỏ nguyên bản ở góc trên phải, hướng mặt/thân và đường bay về vùng trung tâm; dùng biến thể
-    đơn giản của hệ mascot hiện có, không sao chép nhân vật tham khảo có bản quyền.
-  - [ ] Thêm tối đa hai companion phi nhân hình (bướm, chim nhỏ hoặc trái tim biết bay) chạy quỹ đạo elip chậm quanh
-    mascot chính; Lite Mode chỉ giữ một companion và reduced motion đặt chúng ở pose tĩnh.
-  - [ ] Thêm bong bóng thoại nhỏ gắn với mascot: “Chúc mừng sinh nhật nàng tiên của anh 💗”; copy nằm trong config,
-    tự đổi hướng/ẩn khi không đủ chỗ và không che khuôn mặt hoặc card.
-- [ ] R3.10 Chuẩn hóa chiều sâu ba lớp và pointer parallax cho toàn Hero.
-  - [ ] Lớp xa gồm gradient/sao nền; lớp giữa gồm mascot, halo và companion; lớp gần gồm garland, bóng bay gần và
+  - [x] Edge headless đạt 50 FPS desktop Full, 56 FPS Lite, 59 FPS reduced motion, 54 FPS mobile và 46 FPS
+    fallback mobile; lint, build, structural verify và browser regression đều đạt.
+- [x] R3.9 Chuẩn hóa companion để card chính có chuyển động phụ nhưng mascot vẫn là tâm điểm duy nhất.
+  - [x] Gỡ hoàn toàn tiên phụ để không tạo thêm nhân vật cạnh tranh với mascot chính.
+  - [x] Giữ đúng hai trái tim có cánh chạy quỹ đạo elip chậm quanh card chính; Lite Mode và compact chỉ giữ một
+    companion, reduced motion đặt companion ở pose tĩnh và toàn bộ nằm trong canvas phía sau card.
+  - [x] Gỡ hoàn toàn bong bóng thoại và copy liên quan khỏi config/DOM/CSS theo feedback.
+- [x] R3.10 Chuẩn hóa chiều sâu ba lớp và pointer parallax cho toàn Hero.
+  - [x] Lớp xa gồm gradient/sao nền; lớp giữa gồm mascot, halo và companion; lớp gần gồm bóng bay gần và
     sparkle. Mỗi lớp có hệ số parallax riêng nhưng cùng chịu progress/active state từ SectionManager.
-  - [ ] Giới hạn pointer offset, nội suy mượt và reset khi pointer rời viewport; không để vật thể vượt vùng an toàn
+  - [x] Giới hạn pointer offset, nội suy mượt và reset khi pointer rời viewport; không để vật thể vượt vùng an toàn
     hoặc gây say chuyển động.
-  - [ ] Công bố budget cho số geometry, draw call và particle của toàn Hero; không tạo renderer/canvas hay RAF loop mới.
+  - [x] Công bố budget cho số geometry, draw call và particle của toàn Hero; không tạo renderer/canvas hay RAF loop mới.
+  - [x] R3.10 verification: lint, production build, functional parallax/lifecycle/anchor/resource tests and
+    regressions 2.2/2.3, R3.6-R3.9 passed. Edge headless pointer sweep (8 seconds): Full 57 FPS,
+    Lite 59 FPS, reduced motion 60 FPS, mobile 59 FPS, fallback mobile 59 FPS; no horizontal overflow
+    or console errors. Desktop screenshot reviewed. Physical-device Chrome Performance profiling remains
+    part of R3.12/R7; these measurements are local Edge CDP/rAF results.
+  - [x] Budget: 61 resident geometries; <=80 draw submissions including transparent double-sided passes
+    (conservative traversal count: 69); particles Full 1,526 / Lite 466. No extra renderer, canvas or RAF.
+    Pointer translation caps far/middle/near: 2/6/10 CSS px at reference depth, vertical factor 0.65;
+    compact factor 0.45, Lite factor 0.7, progressive attenuation on Hero exit. Touch/reduced motion: off.
 - [ ] R3.11 Cân responsive và các chế độ suy giảm sau khi bản desktop được duyệt.
   - [ ] Nghiệm thu trước tại 1470×956, vùng an toàn 1470×850 và regression 1440×900; sau đó mới xếp lại tablet/mobile
     theo ưu tiên giữ headline, love line và mascot chính.
-  - [ ] Ở compact/mobile, cho phép ẩn lần lượt cụm hoa, shooting star, một phần bóng bay, companion thứ hai và tiên phụ;
+  - [ ] Ở compact/mobile, cho phép ẩn lần lượt shooting star, một phần bóng bay và companion thứ hai;
     không thu nhỏ tất cả tới mức khó đọc chỉ để giữ đủ trang trí.
   - [ ] WebGL fallback 2D giữ cùng quan hệ card–mascot–halo và một bộ trang trí rút gọn; Lite Mode giảm hạt/geometry,
     còn reduced motion loại loop, marquee chuyển động, sway và parallax nhưng giữ nguyên nội dung.
@@ -370,20 +379,76 @@ của lát trước.
 trang trí không che chữ/mặt/đũa phép; sao trên mũ đúng trục; reduced motion, fallback và Lite Mode đầy đủ; Hero đạt
 tối thiểu 30 FPS trên máy tầm trung.
 
+**Điều chỉnh thứ tự theo yêu cầu người dùng (06/09/2026):** triển khai R4.1 trước; giữ R3.11 và R3.12 để làm sau.
+Gate R3 vẫn mở và toàn bộ tiêu chí nghiệm thu còn nguyên.
+
 #### Phase R4 — Cake layout, trigger và tương tác nến
 
-- [ ] R4.1 Đảo bố cục Cake: bánh bên trái, card điều ước bên phải; cập nhật camera/placement cho desktop,
+- [x] R4.1 Đảo bố cục Cake: bánh bên trái, card điều ước bên phải; cập nhật camera/placement cho desktop,
   compact-height, mobile và fallback.
-- [ ] R4.2 Chuyển ngưỡng active/reveal sang SectionManager để bánh chỉ xuất hiện khi Cake vào đủ khoảng 60–80%,
+  - [x] Desktop dùng hai cột với vùng bánh bên trái và card bên phải; placement 3D được chiếu từ bounding box DOM
+    sang world space của camera dùng chung, nên giữ đúng tâm và scale sau resize mà không tạo canvas/renderer mới.
+  - [x] Tablet/mobile xếp bánh phía trên card; CSS fallback có bánh ba tầng, topper và năm nến trong cùng vùng hiển thị,
+    đồng thời tiếp tục phản ánh trạng thái thổi nến/reset khi WebGL không khả dụng.
+  - [x] Compact-height giữ card và bánh trong viewport tại 1280x720; ánh sáng được bù theo scale để bánh mobile
+    không bị tối khi nguồn sáng co theo group.
+  - [x] Lint, production build và regression Phase 3.1/3.2/3.5/3.6 đạt. Edge headless kiểm tra 1470x956,
+    1470x850, 1440x900, 1280x720 Lite, 820x1180, 390x844 Lite, reduced motion và WebGL fallback desktop/mobile;
+    mọi case đạt 60 FPS, không tràn ngang, giữ đúng thứ tự bánh/card và hoàn tất được thổi nến/reset.
+- [x] R4.2 Chuyển ngưỡng active/reveal sang SectionManager để bánh chỉ xuất hiện khi Cake vào đủ khoảng 60–80%,
   không ló sớm từ Hero.
-- [ ] R4.3 Sửa topper/ngôi sao chính thẳng tâm với tầng bánh trên cùng và công bố world anchor ổn định cho R5.
-- [ ] R4.4 Rút card còn tiêu đề, ô điều ước + nút gửi và nút microphone; copy/trạng thái lỗi vẫn lấy từ config.
-- [ ] R4.5 Gỡ nút thổi thủ công khỏi UI chính; thêm raycast hit-area cho từng ngọn lửa để click/tap tắt từng nến,
+  - [x] SectionManager công bố `scenePresence`/`sceneSectionIds` riêng với DOM presence; Cake bắt đầu reveal ở 65%
+    và đạt 100% tại 80% của transition Hero → Cake. Cuộn ngược dùng đúng cùng biên, không hysteresis.
+  - [x] Phép đo section dùng offset layout không chịu CSS transform, tránh ngưỡng bị trôi theo hướng cuộn; SceneManager
+    truyền `setRevealProgress` trong snapshot hiện có, không thêm RAF/timeline/canvas.
+  - [x] Deep-link Cake mở model ở 100%; WebGL fallback dùng cùng `--scene-presence`; reduced motion bỏ dịch chuyển/scale
+    reveal, vẫn giữ ngưỡng và trạng thái nội dung.
+  - [x] Structural verify, lint, production build, regression R1 và Phase 3.1/3.2/3.5 đạt. Edge kiểm tra cuộn xuôi/ngược,
+    deep-link và fallback đạt 60 FPS; browser regression R1 đạt 59–61 FPS ở desktop, intro journey, reduced motion
+    và mobile; R4.1 browser matrix tiếp tục đạt 60 FPS.
+- [x] R4.3 Sửa topper/ngôi sao chính thẳng tâm với tầng bánh trên cùng và công bố world anchor ổn định cho R5.
+  - [x] Topper và chân đỡ cùng trục X/Z với tầng trên; chân chạm mặt bánh. Ngôi sao có một cánh hướng lên và thanh đỡ tiếp xúc tại hõm giữa hai cánh dưới; extrusion sao căn giữa độ dày trước khi xoay. CSS fallback căn giữa bằng 50% + translateX.
+  - [x] `CakeScene.getTopperWorldPosition(target?)` trả tâm sao trong world space và cập nhật matrix cha khi đọc. R5 gọi sau scene update, tái sử dụng Vector3; scene ẩn vẫn có anchor, trước mount/sau dispose trả null. Không thêm renderer/RAF.
+  - [x] `npm run verify:refinement-r4.3`: 80 mẫu resize/scroll/reveal/full/lite/reduced motion, reset và dispose. Lint, build, regression R4.2 và Phase 3.1 đạt.
+  - [x] Đã kiểm tra ảnh desktop 1470×850; browser regression R4.1/R4.2 bằng Edge headless/CDP đạt 60–61 FPS mẫu requestAnimationFrame. Chưa thay thế phép đo Chrome DevTools Performance trên máy tầm trung.
+- [x] R4.4 Rút card còn tiêu đề, ô điều ước + nút gửi và nút microphone; copy/trạng thái lỗi vẫn lấy từ config.
+  - [x] Gỡ section number/icon, eyebrow, mô tả và phase note khỏi riêng card Cake; đổi tiêu đề thành “Một điều ước nhỏ”.
+  - [x] Form dùng copy “Gửi điều ước”; label, hint và live status vẫn semantic nhưng không tạo thêm chrome thị giác.
+  - [x] Nút microphone cùng các trạng thái requesting/calibrating/listening/error tiếp tục lấy toàn bộ copy từ config.
+  - [x] Nút thổi thủ công được giữ tạm để không làm mất fallback trước khi raycast từng nến thay thế nó ở R4.5.
+  - [x] Lint, production build, verify R4.2–R4.4 và regression Phase 3.4/3.5 đạt; browser matrix R4.1 tiếp tục
+    đạt 60 FPS ở desktop, compact-height, tablet, mobile, reduced motion và WebGL fallback, không tràn viewport.
+- [x] R4.5 Gỡ nút thổi thủ công khỏi UI chính; thêm raycast hit-area cho từng ngọn lửa để click/tap tắt từng nến,
   hỗ trợ debounce và trạng thái nến đã tắt.
-- [ ] R4.6 Tạo keyboard/WebGL fallback tương đương cho tương tác từng nến; mic denied/timeout/unsupported không
+  - [x] Gỡ component, handler, copy và CSS của nút thổi thủ công; trạng thái lỗi mic hướng người xem chạm trực tiếp
+    từng ngọn lửa và vẫn lấy copy từ config.
+  - [x] Năm hit-area riêng dùng chung geometry/material, Raycaster/Vector2 được tái sử dụng; tọa độ client chuyển
+    sang NDC theo canvas rect nên độc lập DPR/resize và chỉ hoạt động khi Cake active, reveal đủ, điều ước sẵn sàng.
+  - [x] Mỗi pointer gesture chỉ tắt đúng một flame; nến đã tắt/đang tắt không nhận hit lại, có debounce 220ms,
+    smoke/glow/litCount cập nhật theo từng nến và mic vẫn tắt toàn bộ phần còn lại.
+  - [x] Reset phục hồi đủ năm flame/hit state; dispose gỡ listener và giải phóng hit-area, không thêm canvas/renderer/RAF.
+  - [x] Lint, build, verify R4.2–R4.5 và regression Phase 3.1/3.3–3.5 đạt. Edge CDP xác nhận mouse/touch,
+    duplicate gesture và zero exception: 57 FPS desktop DPR 2, 60 FPS mobile DPR 2, không tràn ngang.
+- [x] R4.6 Tạo keyboard/WebGL fallback tương đương cho tương tác từng nến; mic denied/timeout/unsupported không
   được chặn hoàn thành nghi thức.
-- [ ] R4.7 Gỡ CelebrationConfetti và CakeFairyCelebration khỏi bundle/lifecycle Cake; giữ reset demo không rò rỉ
+  - [x] Bổ sung event kích hoạt theo chỉ số dùng chung; WebGL đi qua state machine flame hiện có, kiểm tra active,
+    reveal, điều ước, biên index và trạng thái nến trước khi tắt đúng một ngọn.
+  - [x] Năm button semantic hỗ trợ Tab/Enter/Space, có nhãn sáng/tắt từ config và focus ring; fallback CSS cho phép
+    click/tap/keyboard trực tiếp từng nến, nến đã tắt bị disabled và reset phục hồi đủ năm nến.
+  - [x] Denied được kiểm thử trực tiếp trong Edge và không khóa ba nến còn lại; regression Phase 3.4 xác nhận thêm
+    timeout/unsupported cùng phân loại lỗi và cleanup stream muộn.
+  - [x] Lint, production build, verify R4.2–R4.6 và browser regression R4.5 đạt. Edge CDP DPR 2 xác nhận Enter/Space,
+    fallback, reset và zero exception: 61 FPS WebGL, 60 FPS fallback; R4.5 đạt 59 FPS desktop/60 FPS mobile.
+- [x] R4.7 Gỡ CelebrationConfetti và CakeFairyCelebration khỏi bundle/lifecycle Cake; giữ reset demo không rò rỉ
   event, geometry hoặc audio stream.
+  - [x] Gỡ import, khởi tạo, scene node, trigger/update, quality, reset và dispose của hai hiệu ứng khỏi CakeScene; xóa hai
+    module nguồn không còn consumer. Production bundle và source hiện hành không còn class/tên node celebration cũ.
+  - [x] Gỡ confetti DOM/CSS fallback cùng keyframe responsive/reduced-motion; vẫn giữ wishReleased, WishStarFlight,
+    live status và nút reset như hợp đồng chức năng của nghi thức.
+  - [x] Verify R4.7 xác nhận wish release, reset về idle/litCount = 5, cleanup listener/hit-area/scene resources và
+    không nhân đôi reset sau dispose. Regression R4.2–R4.6, Phase 3.4–3.6, lint và production build đều đạt.
+  - [x] Edge CDP regression R4.6 đạt 61 FPS WebGL và 60 FPS fallback; Enter/Space, mic denied không chặn flow,
+    reset và zero exception tiếp tục đạt. Cake production chunk 17,93 kB trước gzip.
 - [ ] R4.8 Kiểm thử trigger hai chiều, hit-test ở DPR/tỉ lệ màn hình khác nhau, mic privacy, touch target và FPS.
 
 **Gate R4:** bánh chỉ hiện đúng ngưỡng, bố cục bánh trái/card phải, topper đúng tâm, card đúng ba thành phần,
@@ -391,13 +456,38 @@ không confetti/mascot phụ và mọi môi trường vẫn có cách tắt đ�
 
 #### Phase R5 — Hành trình điều ước Cake → Hero
 
-- [ ] R5.1 Chuẩn hóa ba anchor dùng chung: nguồn từ ô điều ước, topper sao trên bánh và đầu đũa mascot Hero;
+- [x] R5.1 Chuẩn hóa ba anchor dùng chung: nguồn từ ô điều ước, topper sao trên bánh và đầu đũa mascot Hero;
   chuyển đổi chính xác giữa DOM, world space và screen space sau resize.
-- [ ] R5.2 Thay celebration cũ bằng chuỗi hạt/sao: chữ trong input tan thành hạt → hội tụ vào topper Cake.
-- [ ] R5.3 Tiếp tục đường bay topper Cake → sao trên đũa Hero trong renderer/canvas dùng chung, không teleport
+  - [x] Tạo JourneyAnchorRegistry do SceneManager sở hữu và truyền qua scene context; ba ID wish-source/cake-topper/
+    hero-wand-tip dùng provider DOM/world có cleanup theo registration token, không thêm canvas, renderer hoặc RAF.
+  - [x] WishInput công bố DOM hook ổn định; Cake đăng ký source + topper, Hero đăng ký đầu đũa. Getter world cập nhật
+    parent matrix khi đọc, dùng được khi scene ẩn và trả null trước mount/sau dispose.
+  - [x] Chuẩn hóa client ↔ NDC, world → client và client → world trên mặt phẳng Z theo canvas bounding rect/camera;
+    round-trip đạt sai số dưới 1e-8 qua resize, canvas offset và không phụ thuộc DPR.
+  - [x] Verify R5.1, regression R3.10/R4.3/R4.7, lint và production build đạt; resource budget Hero không đổi.
+    Edge CDP regression đạt 60 FPS WebGL, 61 FPS fallback; keyboard, mic denied và reset tiếp tục đạt.
+- [x] R5.2 Thay celebration cũ bằng chuỗi hạt/sao: chữ trong input tan thành hạt → hội tụ vào topper Cake.
+  - [x] WishParticleConvergence dùng một draw call, budget Full/Lite 96/40 và reduced-motion; geometry/material được tái sử dụng qua launch/reset.
+  - [x] Dùng wish-source/cake-topper từ JourneyAnchorRegistry, retarget mượt khi resize/transform và chốt chính xác tại topper; chưa bay sang Hero.
+  - [x] Thay DOM copy bay chéo bằng dissolve tại nguồn; fallback vẫn hoàn tất callback để reset không bị kẹt.
+  - [x] Gỡ WishStarFlight cũ khỏi Cake bundle; verify quỹ đạo/endpoint/reset/dispose và regression liên quan đều đạt.
+  - [x] Lint, production build và Edge CDP đạt; WebGL convergence 40 FPS, fallback 60 FPS, reset đạt.
+- [x] R5.3 Tiếp tục đường bay topper Cake → sao trên đũa Hero trong renderer/canvas dùng chung, không teleport
   hoặc tạo particle system thứ hai ngoài quản lý.
-- [ ] R5.4 Điều phối auto-scroll ngược Cake → Hero qua SectionManager, đồng bộ camera, active scene và đường bay.
-- [ ] R5.5 Cho phép wheel/touch/keyboard hủy auto-scroll an toàn; khóa chống kích hoạt lặp và phục hồi focus/
+  - [x] Tái sử dụng đúng một WishParticleConvergence/BufferGeometry/ShaderMaterial/draw call cho cả hai chặng; launchContinuation
+    giữ nguyên seed/resource và bắt đầu toàn bộ hạt chính xác tại topper.
+  - [x] CakeScene điều phối state source-to-topper → topper-to-wand → complete, đọc live cake-topper/hero-wand-tip từ
+    JourneyAnchorRegistry và retarget mượt sau resize/transform; event state sẵn sàng cho R5.4 nhưng chưa tự scroll.
+  - [x] Full/Lite giữ budget 96/40 hạt, reduced motion rút ngắn cả hai chặng; reset/dispose dừng sạch và dùng lại được,
+    không thêm canvas, renderer, RAF hay particle system thứ hai.
+  - [x] Verify R5.3, R5.1/R5.2, R4.7, Phase 3.5/3.6, lint và production build đạt. Edge headless DPR 2 xác nhận đúng
+    thứ tự ba state, scroll không đổi, zero exception và 54 FPS trong hành trình.
+- [x] R5.4 Điều phối auto-scroll ngược Cake → Hero qua SectionManager, đồng bộ camera, active scene và đường bay.
+  - [x] `SectionManager` sở hữu tween hữu hạn Cake → Hero, cập nhật snapshot tối đa khoảng 30Hz và khôi phục trạng thái scroll sau khi hoàn tất.
+  - [x] `App` điều phối lifecycle hành trình; `SceneManager` giữ Cake update khi inactive và tạm hạ DPR trong lúc chuyển cảnh.
+  - [x] Particle dùng cùng một resource, bay theo tọa độ world-space từ nguồn sáng → topper → đầu đũa phép.
+  - [x] Đã có verify tĩnh và browser CDP cho thứ tự stage, active section, scroll, DPR phục hồi và lỗi runtime.
+  - [x] Kết quả Edge DPR 2: 37 FPS, scroll 870 → 0, đủ 3 stage, không có exception.- [ ] R5.5 Cho phép wheel/touch/keyboard hủy auto-scroll an toàn; khóa chống kích hoạt lặp và phục hồi focus/
   scroll state sau khi hoàn thành hoặc hủy.
 - [ ] R5.6 Reduced motion dùng fade/teleport có chủ đích; WebGL fallback dùng DOM/CSS nhưng giữ đúng thứ tự
   input → topper → Hero.

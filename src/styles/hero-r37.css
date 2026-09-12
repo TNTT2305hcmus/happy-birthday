@@ -1,0 +1,61 @@
+/* R3.7 static balloons and garden. The former HAPPY BIRTHDAY garland was removed. */
+
+.hero-fallback-static-decor {
+  display: none;
+  pointer-events: none;
+}
+
+html[data-webgl='unavailable'] .hero-fallback-static-decor {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.hero-fallback-balloon {
+  position: absolute;
+  width: 2.3rem;
+  height: 4.9rem;
+  border-left: 1px solid rgb(155 107 133 / 45%);
+}
+
+.hero-fallback-balloon i,
+.hero-fallback-balloon i::before,
+.hero-fallback-balloon i::after {
+  position: absolute;
+  display: block;
+  width: 1.45rem;
+  height: 1.45rem;
+  background: var(--balloon-color, #f2a4c8);
+  content: '';
+}
+
+.hero-fallback-balloon i {
+  top: -0.7rem;
+  left: -0.75rem;
+  border-radius: 0 0 0.28rem;
+  box-shadow: 0 6px 20px rgb(112 76 126 / 16%);
+  transform: rotate(-45deg);
+}
+
+.hero-fallback-balloon i::before {
+  top: -0.72rem;
+  left: 0;
+  border-radius: 50% 50% 0 0;
+}
+
+.hero-fallback-balloon i::after {
+  top: 0;
+  left: 0.72rem;
+  border-radius: 0 50% 50% 0;
+}
+
+.hero-fallback-balloon-1 { --balloon-color: #f2a4c8; top: 22%; left: 46%; height: 5.8rem; }
+.hero-fallback-balloon-2 { --balloon-color: #c9b6ff; top: 54%; left: 63%; height: 4.4rem; transform: scale(0.82); }
+.hero-fallback-balloon-3 { --balloon-color: #ffd98a; top: 28%; right: 4%; height: 6.3rem; transform: scale(0.9); }
+.hero-fallback-balloon-4 { --balloon-color: #e98eb7; right: 22%; bottom: 9%; height: 3.9rem; transform: scale(0.72); }
+
+@media (max-width: 700px) {
+  .hero-fallback-static-decor {
+    display: none !important;
+  }
+}

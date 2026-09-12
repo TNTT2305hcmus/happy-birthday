@@ -70,6 +70,7 @@ export class MagicTrail {
     this.lives = null
     this.sizes = null
     this.velocities = null
+    this.durations = null
     this.material = new ShaderMaterial({
       blending: AdditiveBlending,
       depthWrite: false,
@@ -97,6 +98,7 @@ export class MagicTrail {
     this.lives = new Float32Array(count).fill(1)
     this.sizes = new Float32Array(count)
     this.velocities = new Float32Array(count * 3)
+    this.durations = new Float32Array(count).fill(1.05)
 
     const positionAttribute = new BufferAttribute(this.positions, 3)
     const lifeAttribute = new BufferAttribute(this.lives, 1)
@@ -112,20 +114,23 @@ export class MagicTrail {
     previousGeometry?.dispose()
   }
 
-  emit(position, energy = 0.5) {
+  emit(position, energy = 0.5, { cascade = false } = {}) {
     const amount = Math.max(1, Math.min(4, Math.round(1 + energy * 3)))
 
     for (let particle = 0; particle < amount; particle += 1) {
       const index = this.cursor
       const offset = index * 3
-      const spread = 0.025 + energy * 0.035
+      const spread = (cascade ? 0.055 : 0.025) + energy * (cascade ? 0.065 : 0.035)
 
       this.positions[offset] = position.x + (this.random() - 0.5) * spread
       this.positions[offset + 1] = position.y + (this.random() - 0.5) * spread
       this.positions[offset + 2] = position.z + (this.random() - 0.5) * spread
-      this.velocities[offset] = (this.random() - 0.5) * 0.12
-      this.velocities[offset + 1] = 0.06 + this.random() * 0.12
+      this.velocities[offset] = (this.random() - 0.5) * (cascade ? 0.24 : 0.12)
+      this.velocities[offset + 1] = cascade
+        ? -0.11 - this.random() * 0.2
+        : 0.06 + this.random() * 0.12
       this.velocities[offset + 2] = (this.random() - 0.5) * 0.08
+      this.durations[index] = cascade ? 1.35 + this.random() * 0.35 : 1.05
       this.lives[index] = 0
       this.sizes[index] = 2.2 + this.random() * 3.8
       this.cursor = (this.cursor + 1) % this.lives.length
@@ -143,7 +148,7 @@ export class MagicTrail {
       if (this.lives[index] >= 1) continue
 
       const offset = index * 3
-      this.lives[index] = Math.min(1, this.lives[index] + delta / 1.05)
+      this.lives[index] = Math.min(1, this.lives[index] + delta / this.durations[index])
       this.positions[offset] += this.velocities[offset] * delta
       this.positions[offset + 1] += this.velocities[offset + 1] * delta
       this.positions[offset + 2] += this.velocities[offset + 2] * delta

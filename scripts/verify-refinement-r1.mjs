@@ -8,6 +8,7 @@ const [
   planning,
   sceneManagerSource,
   sectionManagerSource,
+  sectionSnapshotSource,
   storySectionSource,
   styleSource,
 ] = await Promise.all([
@@ -17,6 +18,7 @@ const [
   readFile(new URL('../PLANNING.md', import.meta.url), 'utf8'),
   readFile(new URL('../src/core/SceneManager.js', import.meta.url), 'utf8'),
   readFile(new URL('../src/core/SectionManager.jsx', import.meta.url), 'utf8'),
+  readFile(new URL('../src/core/sectionSnapshot.js', import.meta.url), 'utf8'),
   readFile(new URL('../src/components/StorySection.jsx', import.meta.url), 'utf8'),
   readFile(new URL('../src/styles/global.css', import.meta.url), 'utf8'),
 ])
@@ -27,7 +29,8 @@ assert.ok(appSource.includes('setSectionSnapshot'))
 assert.equal(appSource.includes('heroScene.setActive'), false)
 assert.equal(appSource.includes('cakeScene.setActive'), false)
 assert.equal(appSource.includes('letterScene.setActive'), false)
-assert.ok(sectionManagerSource.includes('TRANSITION_START'))
+assert.ok(sectionManagerSource.includes('calculateSectionSnapshot'))
+assert.ok(sectionSnapshotSource.includes('TRANSITION_START'))
 assert.ok(sectionManagerSource.includes('presentSectionIds'))
 assert.ok(sectionManagerSource.includes('element.inert = !isInteractive'))
 assert.ok(sectionManagerSource.includes('aria-hidden'))

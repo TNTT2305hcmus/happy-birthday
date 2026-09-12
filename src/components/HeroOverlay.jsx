@@ -1,5 +1,6 @@
 import { createHeroOverlayModel } from './heroOverlayModel.js'
 import { HeroFallbackFairy } from './HeroFallbackFairy.jsx'
+import { HeroStaticDecor } from './HeroStaticDecor.jsx'
 
 export function HeroOverlay({ recipient, relationship, section }) {
   const copy = section.heroCopy
@@ -7,6 +8,7 @@ export function HeroOverlay({ recipient, relationship, section }) {
 
   return (
     <div className="hero-overlay">
+      <HeroStaticDecor />
       <div className="hero-copy-panel">
         <div className="hero-date-chip">
           <span className="hero-tag-sparkle" aria-hidden="true">✦</span>

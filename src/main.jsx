@@ -24,6 +24,10 @@ import '@fontsource/dancing-script/latin-700.css'
 import '@fontsource/dancing-script/vietnamese-700.css'
 import App from './App.jsx'
 import './styles/global.css'
+import './styles/hero-r37.css'
+import './styles/hero-r38.css'
+import './styles/cake-r41.css'
+import './styles/cake-r44.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

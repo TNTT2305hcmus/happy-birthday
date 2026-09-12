@@ -24,6 +24,8 @@ function Test-HeroViewport {
   if ($Motion -eq 'reduced') { $arguments += '--force-prefers-reduced-motion=reduce' }
   $url = if ($Name -eq 'fallback-mobile') {
     'http://127.0.0.1:4178/?section=hero&webgl=off'
+  } elseif ($Name -eq 'desktop-lite') {
+    'http://127.0.0.1:4178/?section=hero&quality=lite'
   } else {
     'http://127.0.0.1:4178/?section=hero&quality=full'
   }
@@ -60,6 +62,7 @@ try {
 
   Test-HeroViewport -Name 'desktop-safe' -Port 9371 -Width 1470 -Height 850 -Motion 'full'
   Test-HeroViewport -Name 'desktop-reduced' -Port 9372 -Width 1440 -Height 900 -Motion 'reduced'
+  Test-HeroViewport -Name 'desktop-lite' -Port 9375 -Width 1470 -Height 850 -Motion 'full'
   Test-HeroViewport -Name 'mobile' -Port 9373 -Width 390 -Height 844 -Motion 'full'
   Test-HeroViewport -Name 'fallback-mobile' -Port 9374 -Width 390 -Height 844 -Motion 'full'
 } finally {

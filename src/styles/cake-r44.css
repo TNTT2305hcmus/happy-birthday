@@ -1,0 +1,90 @@
+/* R4.4: the Cake card keeps one heading, the wish form and the microphone action. */
+.cake-copy-panel {
+  padding: clamp(1.35rem, 3vw, 2.2rem);
+}
+
+.cake-card-title {
+  max-width: 12ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.15rem, 4vw, 3.25rem);
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.cake-controls {
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.cake-controls .wish-input-shell {
+  gap: 0.45rem;
+  margin-top: 0;
+}
+
+.cake-controls .wish-divider {
+  display: none;
+}
+
+/* The textarea retains a programmatic label and live status without adding card chrome. */
+.cake-controls .wish-form label,
+.cake-controls .wish-form > p,
+.cake-controls .wish-form-status,
+.cake-controls .cake-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cake-controls .wish-form textarea {
+  min-height: 6.4rem;
+}
+
+.cake-controls .wish-form button,
+.cake-controls .cake-mic-button {
+  min-height: 3.25rem;
+}
+
+.cake-story-section[data-section-state='active'] .cake-visual-stage[data-candle-interaction='ready'] {
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: pan-y;
+}
+
+.cake-visual-stage[data-candle-interaction='locked'] .cake-keyboard-candles,
+.cake-visual-stage[data-candle-interaction='locked'] .cake-fallback-candles {
+  pointer-events: none;
+}
+
+@media (min-width: 900px) and (max-height: 980px) {
+  .cake-copy-panel {
+    padding: clamp(1.15rem, 2.4vh, 1.6rem);
+  }
+
+  .cake-card-title {
+    font-size: clamp(2rem, 4.8vh, 2.75rem);
+  }
+
+  .cake-controls {
+    margin-top: 0.7rem;
+  }
+
+  .cake-controls .wish-form textarea {
+    min-height: 4.5rem;
+    max-height: 4.5rem;
+  }
+}
+
+@media (max-width: 899px) {
+  .cake-card-title {
+    max-width: none;
+    font-size: clamp(2rem, 9vw, 2.8rem);
+  }
+}

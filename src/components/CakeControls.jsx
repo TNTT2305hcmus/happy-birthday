@@ -6,6 +6,7 @@ import {
 import {
   CAKE_STATUS_EVENT,
   requestCakeBlow,
+  requestCakeInteractionReady,
   requestCakeReset,
   requestCakeWish,
 } from '../scenes/cakeEvents.js'
@@ -49,6 +50,7 @@ export function CakeControls({ copy }) {
         detector.stop()
       }
       detectorRef.current = null
+      requestCakeInteractionReady(false)
     }
   }, [])
 
@@ -62,6 +64,7 @@ export function CakeControls({ copy }) {
     setPreparedWish(wish)
     setWishReleased(false)
     setShowWishFlight(false)
+    requestCakeInteractionReady(true)
   }
 
   function handleReset() {
@@ -84,13 +87,8 @@ export function CakeControls({ copy }) {
     setMicState(microphoneSupported ? 'inactive' : 'unsupported')
     setMicFailure(microphoneSupported ? null : 'unsupported')
     setRitualCycle((cycle) => cycle + 1)
+    requestCakeInteractionReady(false)
     requestCakeReset()
-  }
-
-  function handleManualBlow() {
-    if (status !== 'idle' || !preparedWish) return
-    setStatus('extinguishing')
-    requestCakeBlow()
   }
 
   async function handleMicrophone() {
@@ -152,12 +150,6 @@ export function CakeControls({ copy }) {
       data-celebrating={wishReleased}
       data-wish-ready={Boolean(preparedWish)}
     >
-      {wishReleased && (
-        <div className="cake-celebration-fallback" aria-hidden="true">
-          {Array.from({ length: 18 }, (_, index) => <i key={index} />)}
-          <span>✦</span>
-        </div>
-      )}
       <WishInput
         key={ritualCycle}
         copy={copy.wishForm}
@@ -191,22 +183,10 @@ export function CakeControls({ copy }) {
           <span aria-hidden="true">!</span>
           <p>
             <strong>{fallbackMessage}</strong>
-            <small>{copy.micFallbackManualHint}</small>
+            <small>{copy.micFallbackInteractionHint}</small>
           </p>
         </div>
       )}
-      <button
-        className="cake-blow-button"
-        disabled={status !== 'idle' || !preparedWish}
-        onClick={handleManualBlow}
-        type="button"
-      >
-        <span className="cake-blow-icon" aria-hidden="true">◌</span>
-        <span>
-          <strong>{status === 'complete' ? copy.completeButtonLabel : copy.manualButtonLabel}</strong>
-          <small>{preparedWish ? copy.manualButtonHint : copy.awaitingWishHint}</small>
-        </span>
-      </button>
       {status === 'complete' && (
         <button
           className="cake-reset-button"
