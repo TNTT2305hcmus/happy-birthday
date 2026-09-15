@@ -2,6 +2,7 @@ import { CakeVisualStage } from './CakeVisualStage.jsx'
 import { HeroOverlay } from './HeroOverlay.jsx'
 import { CakeControls } from './CakeControls.jsx'
 import { LetterInteractionSurface } from './LetterInteractionSurface.jsx'
+import { LetterFallback } from './LetterFallback.jsx'
 import { useSectionStage } from '../core/SectionManagerContext.js'
 
 function GalleryPreview({ itemCount }) {
@@ -45,10 +46,17 @@ export function StorySection({ index, recipient, relationship, section }) {
         data-scene={section.sceneModule}
         tabIndex={-1}
       >
-        <LetterInteractionSurface
-          copy={section.letterCopy}
-          sentences={section.placeholderSentences}
-        />
+        <div className="letter-sticky-stage">
+          <LetterInteractionSurface
+            copy={section.letterCopy}
+            sentences={section.placeholderSentences}
+          />
+          <LetterFallback
+            key={sectionStage.state === 'active' && sectionStage.presence >= 0.999 ? 'active' : 'inactive'}
+            copy={section.letterCopy}
+            sentences={section.placeholderSentences}
+          />
+        </div>
       </section>
     )
   }

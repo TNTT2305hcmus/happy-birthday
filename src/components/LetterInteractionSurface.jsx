@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSectionStage } from '../core/SectionManagerContext.js'
 import {
+  LETTER_PAGE_STATE_EVENT,
   LETTER_STATE_EVENT,
+  requestLetterPage,
   requestLetterToggle,
 } from '../scenes/letterEvents.js'
 import { getLetterContentModel } from './letterContentModel.js'
@@ -12,10 +14,19 @@ export function LetterInteractionSurface({ copy, sentences }) {
     status: 'closed',
   })
   const openRef = useRef(false)
+  const [pageState, setPageState] = useState({
+    pageCount: 1,
+    pageIndex: 0,
+    typingStatus: 'idle',
+  })
   const stage = useSectionStage('letter')
   const isInteractive = stage.state === 'active' && stage.presence >= 0.999
   const isFullyOpen = letterState.status === 'open'
   const letterContent = getLetterContentModel(sentences)
+  const canNavigatePages = isInteractive
+    && isFullyOpen
+    && pageState.pageCount > 1
+    && pageState.typingStatus === 'complete'
 
   useEffect(() => {
     function handleLetterState({ detail }) {
@@ -28,8 +39,21 @@ export function LetterInteractionSurface({ copy, sentences }) {
       setLetterState(nextState)
     }
 
+    function handlePageState({ detail }) {
+      if (!detail) return
+      setPageState({
+        pageCount: Math.max(1, Number(detail.pageCount) || 1),
+        pageIndex: Math.max(0, Number(detail.pageIndex) || 0),
+        typingStatus: detail.typingStatus ?? 'idle',
+      })
+    }
+
     window.addEventListener(LETTER_STATE_EVENT, handleLetterState)
-    return () => window.removeEventListener(LETTER_STATE_EVENT, handleLetterState)
+    window.addEventListener(LETTER_PAGE_STATE_EVENT, handlePageState)
+    return () => {
+      window.removeEventListener(LETTER_STATE_EVENT, handleLetterState)
+      window.removeEventListener(LETTER_PAGE_STATE_EVENT, handlePageState)
+    }
   }, [])
 
   function handleToggle() {
@@ -50,6 +74,26 @@ export function LetterInteractionSurface({ copy, sentences }) {
         disabled={!isInteractive}
         onClick={handleToggle}
         tabIndex={isInteractive ? 0 : -1}
+        type="button"
+      />
+      <button
+        aria-controls="letter-semantic-content"
+        aria-label={`Trang trước, trang ${pageState.pageIndex + 1} trên ${pageState.pageCount}`}
+        className="letter-page-control letter-page-control-previous"
+        data-page-active={isInteractive && isFullyOpen && pageState.pageCount > 1}
+        disabled={!canNavigatePages || pageState.pageIndex === 0}
+        onClick={() => requestLetterPage('previous')}
+        tabIndex={canNavigatePages && pageState.pageIndex > 0 ? 0 : -1}
+        type="button"
+      />
+      <button
+        aria-controls="letter-semantic-content"
+        aria-label={`Trang sau, trang ${pageState.pageIndex + 1} trên ${pageState.pageCount}`}
+        className="letter-page-control letter-page-control-next"
+        data-page-active={isInteractive && isFullyOpen && pageState.pageCount > 1}
+        disabled={!canNavigatePages || pageState.pageIndex >= pageState.pageCount - 1}
+        onClick={() => requestLetterPage('next')}
+        tabIndex={canNavigatePages && pageState.pageIndex < pageState.pageCount - 1 ? 0 : -1}
         type="button"
       />
       <article

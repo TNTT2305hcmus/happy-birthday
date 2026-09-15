@@ -18,7 +18,9 @@ import {
 } from 'three'
 import { createLetterPaperTexture } from './LetterPaperTexture.js'
 import {
+  announceLetterPage,
   announceLetterState,
+  LETTER_PAGE_REQUEST_EVENT,
   LETTER_TOGGLE_REQUEST_EVENT,
 } from './letterEvents.js'
 
@@ -44,16 +46,23 @@ const LETTER_POSE = Object.freeze({
   flapEnd: 0.58,
   paperStart: 0.44,
   paperEnd: 1,
-  paperTravel: 1.38,
+  paperTravel: 1.76,
   paperDepthTravel: 0.08,
+  paperScaleTravel: 0.08,
 })
 
 const LETTER_MOTION = Object.freeze({
-  scrollStart: 0.04,
-  scrollEnd: 0.96,
+  scrollStart: 0.3,
+  scrollEnd: 0.58,
   scrollResponse: 4,
   controlResponse: 12,
   controlReleaseDelta: 0.025,
+})
+
+const LETTER_TYPING = Object.freeze({
+  graphemesPerSecond: 34,
+  openThreshold: 0.999,
+  resetThreshold: 0.98,
 })
 
 function roundedRectangle(width, height, radius) {
@@ -160,6 +169,13 @@ export class LetterScene {
     this.paperTexture = null
     this.paperTextAsset = null
     this.paperTextMesh = null
+    this.typingState = 'idle'
+    this.typingElapsed = 0
+    this.typingSession = 0
+    this.revealedGraphemes = 0
+    this.pageIndex = 0
+    this.completedPages = new Set()
+    this.isDisposed = false
     this.letterContent = letterContent
     this.elapsedSeconds = 0
     this.isActive = false
@@ -170,6 +186,7 @@ export class LetterScene {
     this.manualScrollAnchor = null
     this.lastAnnouncedStatus = null
     this.handleToggleRequest = this.handleToggleRequest.bind(this)
+    this.handlePageRequest = this.handlePageRequest.bind(this)
   }
 
   mount(context) {
@@ -205,7 +222,11 @@ export class LetterScene {
     this.paperGroup.add(writingSurface)
 
     if (typeof document !== 'undefined') {
-      this.paperTextAsset = createLetterPaperTexture(this.letterContent)
+      this.paperTextAsset = createLetterPaperTexture(
+        this.letterContent,
+        () => document.createElement('canvas'),
+        { initialRevealCount: 0 },
+      )
       const textMaterial = new MeshBasicMaterial({
         depthWrite: false,
         map: this.paperTextAsset.texture,
@@ -217,7 +238,9 @@ export class LetterScene {
       this.paperTextMesh.visible = false
       this.paperGroup.add(this.paperTextMesh)
       document.fonts?.ready.then(() => {
-        if (this.paperTextAsset?.texture === textMaterial.map) this.paperTextAsset.render()
+        if (!this.isDisposed && this.paperTextAsset?.texture === textMaterial.map) {
+          this.paperTextAsset.render(this.revealedGraphemes, this.pageIndex)
+        }
       })
     }
     this.paperGroup.position.set(0, 0, LETTER_DEPTH.paper)
@@ -278,7 +301,9 @@ export class LetterScene {
     this.resize()
     if (typeof window !== 'undefined') {
       window.addEventListener(LETTER_TOGGLE_REQUEST_EVENT, this.handleToggleRequest)
+      window.addEventListener(LETTER_PAGE_REQUEST_EVENT, this.handlePageRequest)
     }
+    this.announcePageState()
   }
 
   setActive(isActive) {
@@ -288,7 +313,10 @@ export class LetterScene {
       this.manualOpenTarget = null
       this.manualScrollAnchor = null
     }
-    else this.announceState('scroll')
+    else {
+      this.announceState('scroll')
+      this.announcePageState()
+    }
   }
 
   setScrollProgress(progress) {
@@ -319,6 +347,29 @@ export class LetterScene {
     this.setOpen(detail.isOpen, 'control')
   }
 
+  handlePageRequest({ detail }) {
+    if (
+      !this.isActive
+      || this.openProgress < LETTER_TYPING.openThreshold
+      || this.typingState !== 'complete'
+      || this.paperTextAsset?.pageCount <= 1
+    ) return
+    const offset = detail?.direction === 'next' ? 1 : detail?.direction === 'previous' ? -1 : 0
+    const nextPage = this.pageIndex + offset
+    if (!offset || nextPage < 0 || nextPage >= this.paperTextAsset.pageCount) return
+    this.typingSession += 1
+    this.typingElapsed = 0
+    this.pageIndex = nextPage
+    if (this.completedPages.has(nextPage)) {
+      this.typingState = 'complete'
+      this.renderPaperText(this.paperTextAsset.getPageGraphemeCount(nextPage), nextPage)
+    } else {
+      this.typingState = 'idle'
+      this.renderPaperText(0, nextPage)
+    }
+    this.announcePageState()
+  }
+
   applyOpenPose(progress) {
     const flapProgress = smoothstep(
       (progress - LETTER_POSE.flapStart) / (LETTER_POSE.flapEnd - LETTER_POSE.flapStart),
@@ -337,10 +388,91 @@ export class LetterScene {
       LETTER_POSE.paperTravel * paperProgress,
       LETTER_DEPTH.paper + LETTER_POSE.paperDepthTravel * paperProgress,
     )
-    this.paperGroup.scale.setScalar(1 + 0.025 * paperProgress)
+    this.paperGroup.scale.setScalar(1 + LETTER_POSE.paperScaleTravel * paperProgress)
     this.sealGroup.scale.setScalar(1 - sealProgress)
     this.sealGroup.rotation.z = -0.18 * sealProgress
-    if (this.paperTextMesh) this.paperTextMesh.visible = progress >= 0.999
+    if (this.paperTextMesh) this.paperTextMesh.visible = progress >= LETTER_TYPING.openThreshold
+  }
+
+  renderPaperText(revealCount, pageIndex = this.pageIndex) {
+    if (!this.paperTextAsset || this.isDisposed) return
+    const nextPage = Math.max(0, Math.min(this.paperTextAsset.pageCount - 1, pageIndex))
+    const pageTotal = this.paperTextAsset.getPageGraphemeCount(nextPage)
+    const nextCount = Math.max(0, Math.min(pageTotal, revealCount))
+    if (nextCount === this.revealedGraphemes && nextPage === this.paperTextAsset.pageIndex) return
+    this.pageIndex = nextPage
+    this.revealedGraphemes = nextCount
+    this.paperTextAsset.render(nextCount, nextPage)
+  }
+
+  resetTyping({ resetPages = false } = {}) {
+    if (
+      this.typingState === 'idle'
+      && this.revealedGraphemes === 0
+      && (!resetPages || (this.pageIndex === 0 && this.completedPages.size === 0))
+    ) return
+    this.typingSession += 1
+    this.typingState = 'idle'
+    this.typingElapsed = 0
+    if (resetPages) {
+      this.pageIndex = 0
+      this.completedPages.clear()
+    }
+    this.renderPaperText(0, this.pageIndex)
+    this.announcePageState()
+  }
+
+  startTyping(reducedMotion) {
+    if (this.typingState !== 'idle') return
+    this.typingSession += 1
+    this.typingElapsed = 0
+    const pageTotal = this.paperTextAsset.getPageGraphemeCount(this.pageIndex)
+    if (reducedMotion || this.completedPages.has(this.pageIndex) || pageTotal === 0) {
+      this.renderPaperText(pageTotal)
+      this.typingState = 'complete'
+      this.completedPages.add(this.pageIndex)
+      this.announcePageState()
+      return
+    }
+    this.typingState = 'typing'
+    this.announcePageState()
+  }
+
+  updateTyping(delta, reducedMotion) {
+    if (!this.paperTextAsset) return
+    if (this.openProgress <= LETTER_TYPING.resetThreshold) {
+      this.resetTyping({ resetPages: true })
+      return
+    }
+    if (this.openProgress < LETTER_TYPING.openThreshold) return
+    if (this.typingState === 'idle') this.startTyping(reducedMotion)
+    if (this.typingState !== 'typing') return
+    if (reducedMotion) {
+      this.renderPaperText(this.paperTextAsset.getPageGraphemeCount(this.pageIndex))
+      this.typingState = 'complete'
+      this.completedPages.add(this.pageIndex)
+      this.announcePageState()
+      return
+    }
+    this.typingElapsed += delta
+    const revealCount = Math.floor(
+      this.typingElapsed * LETTER_TYPING.graphemesPerSecond + 1e-6,
+    )
+    this.renderPaperText(revealCount)
+    if (this.revealedGraphemes >= this.paperTextAsset.getPageGraphemeCount(this.pageIndex)) {
+      this.typingState = 'complete'
+      this.completedPages.add(this.pageIndex)
+      this.announcePageState()
+    }
+  }
+
+  announcePageState() {
+    if (!this.paperTextAsset) return
+    announceLetterPage({
+      pageCount: this.paperTextAsset.pageCount,
+      pageIndex: this.pageIndex,
+      typingStatus: this.typingState,
+    })
   }
 
   announceState(source = 'scroll', forcedStatus = null) {
@@ -371,7 +503,7 @@ export class LetterScene {
       this.group.position.set(0, -0.12, 0.1)
       this.group.scale.setScalar(0.72)
     } else if (height <= 980) {
-      this.group.position.set(0, -0.12, 0)
+      this.group.position.set(0, -0.16, 0)
       this.group.scale.setScalar(0.78)
     } else {
       this.group.position.set(0, -0.08, 0)
@@ -394,6 +526,7 @@ export class LetterScene {
     this.openProgress += (openTarget - this.openProgress) * openSmoothing
     if (Math.abs(openTarget - this.openProgress) < 0.001) this.openProgress = openTarget
     this.applyOpenPose(this.openProgress)
+    this.updateTyping(delta, reducedMotion)
     this.announceState(this.manualOpenTarget === null ? 'scroll' : 'control')
     if (reducedMotion) {
       this.letterModel.rotation.set(-0.025, -0.06, -0.025)
@@ -406,9 +539,11 @@ export class LetterScene {
   }
 
   dispose() {
+    this.isDisposed = true
     this.group.parent?.remove(this.group)
     if (typeof window !== 'undefined') {
       window.removeEventListener(LETTER_TOGGLE_REQUEST_EVENT, this.handleToggleRequest)
+      window.removeEventListener(LETTER_PAGE_REQUEST_EVENT, this.handlePageRequest)
     }
     const geometries = new Set()
     const materials = new Set()

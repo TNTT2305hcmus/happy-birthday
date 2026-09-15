@@ -10,12 +10,12 @@ function createLetter() {
 }
 
 const mapping = createLetter()
-for (const [scroll, expected] of [[0, 0], [0.04, 0], [0.5, 0.5], [0.96, 1], [1, 1]]) {
+for (const [scroll, expected] of [[0, 0], [0.3, 0], [0.44, 0.5], [0.58, 1], [1, 1]]) {
   mapping.setScrollProgress(scroll)
   assert.ok(Math.abs(mapping.getScrollOpenTarget() - expected) < 0.001)
 }
-mapping.setScrollProgress(0.8)
-assert.ok(mapping.getScrollOpenTarget() > 0.8 && mapping.getScrollOpenTarget() < 0.9)
+mapping.setScrollProgress(0.5)
+assert.ok(mapping.getScrollOpenTarget() > 0.7 && mapping.getScrollOpenTarget() < 0.75)
 
 mapping.applyOpenPose(0.2)
 assert.ok(mapping.sealGroup.scale.x < 0.2)

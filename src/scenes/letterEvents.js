@@ -1,10 +1,24 @@
 export const LETTER_TOGGLE_REQUEST_EVENT = 'twinkle:letter-toggle-request'
 export const LETTER_STATE_EVENT = 'twinkle:letter-state'
+export const LETTER_PAGE_REQUEST_EVENT = 'twinkle:letter-page-request'
+export const LETTER_PAGE_STATE_EVENT = 'twinkle:letter-page-state'
 
 export function requestLetterToggle(isOpen) {
   if (typeof window === 'undefined') return
   window.dispatchEvent(new CustomEvent(LETTER_TOGGLE_REQUEST_EVENT, {
     detail: { isOpen: Boolean(isOpen) },
+  }))
+}
+
+export function requestLetterPage(direction) {
+  if (typeof window === 'undefined' || !['next', 'previous'].includes(direction)) return
+  window.dispatchEvent(new CustomEvent(LETTER_PAGE_REQUEST_EVENT, { detail: { direction } }))
+}
+
+export function announceLetterPage({ pageCount, pageIndex, typingStatus }) {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(LETTER_PAGE_STATE_EVENT, {
+    detail: { pageCount, pageIndex, typingStatus },
   }))
 }
 

@@ -530,7 +530,8 @@ ngắt chuyển động và không phát sinh section/mascot chồng lấn.
     không overflow/lỗi runtime, interaction không regress và đạt 60–61 FPS.
 - [x] R6.4 Làm chậm mapping scroll-progress của seal, flap và paper; scroll mở liên tục theo phần trăm, còn click
   chạy nhanh tới trạng thái mở hoàn toàn.
-  - [x] Scroll ánh xạ tuyến tính từ 4% đến 96% section; tại midpoint đạt đúng 50% và tại 80% chưa hoàn tất sớm.
+  - [x] Mapping ban đầu 4%–96% được R6.8 hiệu chỉnh thành 30%–58% trong runway Letter: bắt đầu sau khi
+    Cake rời transition và đạt 100% trước khi Gallery bắt đầu transition.
   - [x] Tách khoảng tiến độ seal, flap và paper; giữ trình tự seal nhả trước, flap lật đáng kể rồi giấy mới trượt lên.
   - [x] Tách response control/scroll theo tỷ lệ 12/4; click hội tụ trên 94% sau 0,25 giây, scroll vẫn chậm và liên tục.
   - [x] Scroll nhỏ không hủy control override; scroll có chủ đích bàn giao về mapping scroll bằng easing liên tục.
@@ -543,11 +544,30 @@ ngắt chuyển động và không phát sinh section/mascot chồng lấn.
   - [x] Chỉ hiện mesh chữ khi open progress đạt 100%, dispose đầy đủ và thêm verify R6.5.
   - [x] Verify R6.5, R6.1–R6.4, Phase 4.1–4.5, lint, diff check và production build đạt; browser/headless
     visual QA tiếp tục bỏ theo yêu cầu quan sát trực quan đã chốt ở R6.4.
-- [ ] R6.6 Chỉ bắt đầu typing khi open progress đạt 100%; đóng/mở lại có quy tắc restart rõ ràng, reduced motion
+- [x] R6.6 Chỉ bắt đầu typing khi open progress đạt 100%; đóng/mở lại có quy tắc restart rõ ràng, reduced motion
   hiển thị tức thì.
-- [ ] R6.7 Xử lý thư 1/10/20 câu bằng pagination, paper expansion hoặc vùng đọc phù hợp mà không đưa card phụ trở lại.
-- [ ] R6.8 Cân camera/scale cho desktop/mobile, WebGL fallback 2D, contrast và focus; cuộn tiếp sau khi đọc phải
-  bàn giao sạch sang Gallery placeholder.
+  - [x] CanvasTexture reveal theo grapheme trên layout cố định; texture chỉ upload khi số chữ hiển thị thay đổi.
+  - [x] State idle/typing/complete dùng update loop hiện có; đóng reset bằng hysteresis và mở lại gõ từ đầu.
+  - [x] Reduced motion hiển thị trọn thư ngay khi mở; semantic content không announce từng ký tự.
+  - [x] Verify R6.6, regression R6.1–R6.5, Phase 4 liên quan, lint và production build đạt.
+- [x] R6.7 Xử lý thư 1/10/20 câu bằng pagination, paper expansion hoặc vùng đọc phù hợp mà không đưa card phụ trở lại.
+  - [x] Chọn pagination trên CanvasTexture với body 24px cố định; wrap và chia trang theo writing bounds,
+    salutation ở trang đầu, sign-off/signature ở trang cuối và không mất/trùng nội dung.
+  - [x] Chỉ báo trang được vẽ trên giấy; hai vùng Previous/Next semantic bám giấy, đúng biên và không tạo card phụ.
+  - [x] Trang mới typing từ đầu, trang đã đọc hiện đủ khi quay lại; đóng thư reset trang 1 và reduced motion hiện tức thì.
+  - [x] Verify fixture 1/10/20 câu, page state/navigation, R6.1–R6.7, Phase 4.1–4.5, lint và build đạt.
+- [x] R6.8 Cân camera/scale cho baseline MacBook Air M2 `1470×956`, WebGL fallback 2D, contrast và focus;
+  cuộn tiếp sau khi đọc bàn giao sạch sang Gallery placeholder.
+  - [x] Theo yêu cầu rút gọn trước delivery, chỉ nghiệm thu `1470×956`; compact-height/tablet/mobile giữ baseline
+    cũ và dời khỏi phạm vi tối ưu R6.8.
+  - [x] Fallback HTML/CSS dùng cùng config, mở/đóng và phân trang bằng button semantic; không tạo card/renderer/RAF.
+  - [x] Letter dùng runway `300svh` với stage sticky `100svh`; mapping 30%–58% cho phép phong bì đóng/mở đủ
+    hai chiều và typing bắt đầu trong vùng Letter active, không còn bị Cake/Gallery cắt ngang.
+  - [x] Pose mở được tăng paper travel `1.76` và scale `1.08`; tại `1470×956` mép dưới giấy khớp miệng
+    phong bì, mép trên nằm trong camera và page controls được nâng theo đúng vùng giấy.
+  - [x] WebGL controls bị ẩn trong fallback; section inactive reset/vô hiệu tương tác và Gallery nhận active/focus
+    qua SectionManager. Màu giấy/chữ, focus ring và touch target 44px đạt verify.
+  - [x] Verify R6.8 tại `1470×956`, regression Phase 4.1, lint và production build đạt; không chạy browser matrix.
 - [ ] R6.9 Kiểm thử layer ở các mốc 0/25/50/75/100%, click so với scroll, keyboard/touch, long copy và FPS.
 
 **Gate R6:** chỉ còn phong bì, giấy đúng layer ở mọi trạng thái, click mở nhanh/scroll mở chậm, chữ chỉ gõ sau

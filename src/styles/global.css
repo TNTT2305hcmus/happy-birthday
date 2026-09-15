@@ -326,7 +326,19 @@ html[data-journey-scroll='running'] .dev-nav {
 /* ---------- Letter section ---------- */
 .letter-story-section {
   position: relative;
+  display: block;
+  min-height: 300svh;
   padding: 0;
+}
+
+.letter-sticky-stage {
+  position: sticky;
+  top: 0;
+  display: grid;
+  width: 100%;
+  height: 100svh;
+  place-items: center;
+  overflow: clip;
 }
 
 .letter-interaction-surface {
@@ -359,6 +371,38 @@ html[data-journey-scroll='running'] .dev-nav {
   box-shadow: 0 0 0 0.45rem rgb(255 253 249 / 28%);
 }
 
+.letter-page-control {
+  position: absolute;
+  z-index: 1;
+  top: calc(50% - 27svh);
+  left: 50vw;
+  width: clamp(44px, 9svh, 82px);
+  height: clamp(80px, 25svh, 170px);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  outline: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: none;
+  touch-action: manipulation;
+}
+
+.letter-page-control[data-page-active='true'] { pointer-events: auto; }
+
+.letter-page-control-previous { transform: translate(-190%, -50%); }
+.letter-page-control-next { transform: translate(90%, -50%); }
+
+.letter-page-control:disabled {
+  cursor: default;
+}
+
+.letter-page-control:focus-visible {
+  outline: 3px solid var(--pink-strong);
+  outline-offset: 0.2rem;
+  background: rgb(255 253 249 / 12%);
+}
+
 .letter-semantic-content {
   position: absolute;
   width: 1px;
@@ -370,6 +414,170 @@ html[data-journey-scroll='running'] .dev-nav {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: normal;
+}
+
+.letter-fallback {
+  position: relative;
+  display: none;
+  width: min(88vw, 620px);
+  height: min(78svh, 610px);
+  place-items: center;
+  perspective: 900px;
+  color: #62445c;
+}
+
+html[data-webgl='unavailable'] .letter-fallback { display: grid; }
+html[data-webgl='unavailable'] .letter-interaction-surface,
+html[data-webgl='unavailable'] .letter-page-control { display: none; }
+
+.letter-fallback-back,
+.letter-fallback-pocket,
+.letter-fallback-flap,
+.letter-fallback-toggle {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  width: 100%;
+  aspect-ratio: 355 / 218;
+  border-radius: 1.4rem;
+  transform: translate(-50%, -50%);
+}
+
+.letter-fallback-back {
+  z-index: 1;
+  border: 2px solid rgb(125 65 104 / 24%);
+  background: linear-gradient(145deg, #eba1c6, #dca5e9);
+  box-shadow: 0 30px 70px rgb(89 64 95 / 22%);
+}
+
+.letter-fallback-paper {
+  position: absolute;
+  z-index: 2;
+  top: 51%;
+  left: 50%;
+  display: grid;
+  width: 83%;
+  min-height: 58%;
+  align-content: start;
+  padding: clamp(1rem, 3.2vw, 1.8rem);
+  border: 2px solid #d7ae62;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #fffaf0;
+  box-shadow: 0 12px 28px rgb(89 64 95 / 14%);
+  opacity: 0;
+  transform: translate(-50%, -24%);
+  transition: opacity 180ms ease, transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.letter-fallback[data-open='true'] .letter-fallback-paper {
+  opacity: 1;
+  transform: translate(-50%, -82%);
+}
+
+.letter-fallback-paper p { margin: 0; }
+.letter-fallback-salutation {
+  margin-bottom: 0.55rem !important;
+  font-family: var(--font-handwriting);
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
+  font-weight: 700;
+}
+
+.letter-fallback-body {
+  display: grid;
+  gap: 0.4rem;
+  font-family: var(--font-handwriting);
+  font-size: clamp(1rem, 2.25vw, 1.35rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.letter-fallback-paper footer {
+  display: grid;
+  justify-items: end;
+  margin-top: 0.65rem;
+  font-family: var(--font-handwriting);
+}
+
+.letter-fallback-paper footer strong {
+  color: #94466f;
+  font-family: var(--font-script);
+  font-size: 1.2rem;
+}
+
+.letter-fallback-paper small {
+  position: absolute;
+  bottom: 0.55rem;
+  left: 1rem;
+  color: #7a5b70;
+  font-weight: 700;
+}
+
+.letter-fallback-pocket {
+  z-index: 3;
+  border: 2px solid rgb(125 65 104 / 18%);
+  background: linear-gradient(155deg, #f5b8d5 0 49%, #dca5e9 50% 100%);
+  clip-path: polygon(0 26%, 50% 62%, 100% 26%, 100% 100%, 0 100%);
+}
+
+.letter-fallback-flap {
+  z-index: 4;
+  height: 50%;
+  border-radius: 1.4rem 1.4rem 0 0;
+  background: #efadd0;
+  clip-path: polygon(0 0, 100% 0, 50% 88%);
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 0;
+  transition: transform 380ms ease, z-index 0s linear 190ms;
+}
+
+.letter-fallback[data-open='true'] .letter-fallback-flap {
+  z-index: 1;
+  transform: translate(-50%, -50%) rotateX(180deg);
+}
+
+.letter-fallback-toggle {
+  z-index: 5;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.letter-fallback-toggle:focus-visible {
+  outline: 3px solid #b83f78;
+  outline-offset: 0.5rem;
+  box-shadow: 0 0 0 0.45rem rgb(255 250 240 / 70%);
+}
+
+.letter-fallback-page {
+  position: absolute;
+  z-index: 6;
+  top: 25%;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 2px solid #9d547a;
+  border-radius: 50%;
+  background: #fffaf0;
+  color: #743b5c;
+  cursor: pointer;
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.letter-fallback-page-previous { left: 4%; }
+.letter-fallback-page-next { right: 4%; }
+.letter-fallback-page:disabled { opacity: 0; pointer-events: none; }
+.letter-fallback-page:focus-visible { outline: 3px solid #b83f78; outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-fallback-paper,
+  .letter-fallback-flap { transition: none; }
 }
 
 @media (min-height: 981px) and (min-aspect-ratio: 4 / 3) {
@@ -390,6 +598,15 @@ html[data-journey-scroll='running'] .dev-nav {
     top: calc(50% + 4.3svh);
     width: min(calc(100vw - 1.5rem), 41.1svh);
   }
+
+  .letter-page-control {
+    top: calc(50% - 3svh);
+    width: 44px;
+    height: min(20svh, 140px);
+  }
+
+  .letter-page-control-previous { transform: translate(-170%, -50%); }
+  .letter-page-control-next { transform: translate(70%, -50%); }
 }
 
 .cake-controls {
