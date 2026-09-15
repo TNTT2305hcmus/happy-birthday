@@ -23,11 +23,10 @@ function contrast(foreground, background) {
 
 assert.ok(contrast('#4f3656', '#fffdf7') >= 7)
 assert.ok(contrast('#6f5875', '#fffdf9') >= 4.5)
-assert.ok(stylesheet.includes('@media (min-width: 1100px) and (max-height: 980px)'))
-assert.ok(stylesheet.includes('overscroll-behavior: contain'))
-assert.ok(stylesheet.includes('scrollbar-gutter: stable'))
-assert.ok(stylesheet.includes('touch-action: pan-y'))
-assert.ok(stylesheet.includes('.letter-preview-scroll::-webkit-scrollbar-thumb'))
+assert.ok(stylesheet.includes('.letter-story-section'))
+assert.ok(stylesheet.includes('padding: 0'))
+assert.ok(!stylesheet.includes('.letter-copy-panel'))
+assert.ok(!stylesheet.includes('.letter-preview-scroll'))
 assert.ok(planning.includes('- [x] 4.5 Hoàn thiện bố cục desktop/mobile'))
 
 console.log('Phase 4.5 responsive and contrast verification passed')

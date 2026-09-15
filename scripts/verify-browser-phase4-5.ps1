@@ -31,7 +31,7 @@ function Test-LetterViewport {
   if ($Motion -eq 'reduced') {
     $arguments += '--force-prefers-reduced-motion=reduce'
   }
-  $arguments += "http://127.0.0.1:4174/?section=letter&quality=full"
+  $arguments += "http://127.0.0.1:4174/?section=all&experience=off&quality=full#letter"
 
   $edgeProcess = Start-Process -FilePath $edgePath -ArgumentList $arguments -WindowStyle Hidden -PassThru
   try {

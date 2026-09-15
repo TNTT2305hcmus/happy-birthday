@@ -25,7 +25,7 @@ schedule.items.forEach((item, index) => {
 assert.ok(controlsSource.includes("data-letter-reveal={isOpen ? 'writing' : 'hidden'}"))
 assert.ok(controlsSource.includes("'--letter-delay'"))
 assert.ok(controlsSource.includes('previewScrollRef.current.scrollTop = 0'))
-assert.ok(stylesheet.includes('@keyframes letter-ink-reveal'))
+assert.ok(!stylesheet.includes('@keyframes letter-ink-reveal'))
 assert.ok(stylesheet.includes("@media (prefers-reduced-motion: reduce)"))
 assert.ok(stylesheet.includes('animation: none'))
 

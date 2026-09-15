@@ -1,7 +1,7 @@
 import { CakeVisualStage } from './CakeVisualStage.jsx'
 import { HeroOverlay } from './HeroOverlay.jsx'
 import { CakeControls } from './CakeControls.jsx'
-import { LetterControls } from './LetterControls.jsx'
+import { LetterInteractionSurface } from './LetterInteractionSurface.jsx'
 import { useSectionStage } from '../core/SectionManagerContext.js'
 
 function GalleryPreview({ itemCount }) {
@@ -36,16 +36,29 @@ export function StorySection({ index, recipient, relationship, section }) {
     )
   }
 
+  if (section.id === 'letter') {
+    return (
+      <section
+        data-section-state={sectionStage.state}
+        className={'story-section letter-story-section'}
+        id={section.id}
+        data-scene={section.sceneModule}
+        tabIndex={-1}
+      >
+        <LetterInteractionSurface
+          copy={section.letterCopy}
+          sentences={section.placeholderSentences}
+        />
+      </section>
+    )
+  }
+
   const sectionClassName = section.id === 'cake'
     ? 'story-section cake-story-section'
-    : section.id === 'letter'
-      ? 'story-section letter-story-section'
-      : 'story-section'
+    : 'story-section'
   const cardClassName = section.id === 'cake'
     ? 'section-card cake-copy-panel'
-    : section.id === 'letter'
-      ? 'section-card letter-copy-panel'
-      : 'section-card'
+    : 'section-card'
 
   return (
     <section
@@ -74,12 +87,6 @@ export function StorySection({ index, recipient, relationship, section }) {
           </>
         )}
 
-        {section.id === 'letter' && (
-          <LetterControls
-            copy={section.letterCopy}
-            sentences={section.placeholderSentences}
-          />
-        )}
         {section.id === 'gallery' && <GalleryPreview itemCount={section.items.length} />}
         {section.id === 'cake' && <CakeControls copy={section.cakeCopy} />}
 

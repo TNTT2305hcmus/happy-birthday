@@ -99,7 +99,11 @@ function App() {
         })
         sceneManager.addSceneModule(new HeroScene(), { sectionId: 'hero' })
         sceneManager.addSceneModule(new CakeScene(), { sectionId: 'cake' })
-        sceneManager.addSceneModule(new LetterScene(), { sectionId: 'letter' })
+        const letterSection = birthdayContent.sections.find(({ id }) => id === 'letter')
+        sceneManager.addSceneModule(new LetterScene({
+          copy: letterSection?.letterCopy,
+          sentences: letterSection?.placeholderSentences,
+        }), { sectionId: 'letter' })
         sceneManagerRef.current = sceneManager
         sceneManager.setSectionSnapshot(sectionSnapshotRef.current ?? {})
 

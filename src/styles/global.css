@@ -325,90 +325,71 @@ html[data-journey-scroll='running'] .dev-nav {
 
 /* ---------- Letter section ---------- */
 .letter-story-section {
-  padding-inline: clamp(1.25rem, 4vw, 4rem);
+  position: relative;
+  padding: 0;
 }
 
-.letter-copy-panel {
-  width: min(540px, 46vw);
-  margin-right: auto;
-  background:
-    radial-gradient(circle at 90% 10%, rgb(255 217 138 / 20%), transparent 28%),
-    linear-gradient(145deg, rgb(255 253 249 / 91%), rgb(245 229 255 / 76%));
-}
-
-.letter-copy-panel .section-icon {
-  color: var(--pink-strong);
-  filter: drop-shadow(0 0 12px rgb(255 158 207 / 42%));
-}
-
-.letter-controls {
-  display: grid;
-  gap: 0.55rem;
-  margin-top: 1.15rem;
-}
-
-.letter-toggle-button {
-  display: flex;
-  min-height: 3.6rem;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 0.65rem 0.9rem;
-  border: 1px solid rgb(207 93 142 / 24%);
-  border-radius: 1rem;
-  background: linear-gradient(135deg, rgb(255 217 236 / 82%), rgb(226 210 255 / 76%));
-  box-shadow: 0 12px 24px rgb(111 65 109 / 12%);
-  color: var(--ink);
+.letter-interaction-surface {
+  position: absolute;
+  top: calc(50% + 2.9svh);
+  left: 50vw;
+  width: min(calc(100vw - 1.5rem), 66.8svh);
+  min-width: 44px;
+  min-height: 44px;
+  aspect-ratio: 355 / 218;
+  padding: 0;
+  border: 0;
+  border-radius: 8%;
+  outline: 0;
+  background: transparent;
+  color: transparent;
   cursor: pointer;
-  text-align: left;
-  transition: box-shadow 180ms ease, transform 180ms ease;
+  touch-action: manipulation;
+  transform: translate(-50%, -50%);
 }
 
-.letter-toggle-button:hover {
-  box-shadow: 0 16px 30px rgb(111 65 109 / 18%);
-  transform: translateY(-2px);
+.letter-interaction-surface:disabled {
+  cursor: default;
+  pointer-events: none;
 }
 
-.letter-toggle-button:focus-visible {
+.letter-interaction-surface:focus-visible {
   outline: 3px solid var(--pink-strong);
-  outline-offset: 3px;
+  outline-offset: 0.45rem;
+  box-shadow: 0 0 0 0.45rem rgb(255 253 249 / 28%);
 }
 
-.letter-toggle-icon {
-  display: grid;
-  width: 2.35rem;
-  aspect-ratio: 1;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 50%;
-  background: rgb(255 253 249 / 74%);
-  color: var(--pink-strong);
-  font-size: 1.1rem;
+.letter-semantic-content {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: normal;
 }
 
-.letter-toggle-button > span:last-child {
-  display: grid;
-  gap: 0.08rem;
+@media (min-height: 981px) and (min-aspect-ratio: 4 / 3) {
+  .letter-interaction-surface {
+    top: calc(50% + 1.9svh);
+    width: min(calc(100vw - 1.5rem), 73.7svh);
+  }
 }
 
-.letter-toggle-button strong {
-  font-size: 0.92rem;
+@media (max-aspect-ratio: 4 / 3) and (min-width: 700px) {
+  .letter-interaction-surface {
+    width: min(calc(100vw - 1.5rem), 61.7svh);
+  }
 }
 
-.letter-toggle-button small {
-  color: #6f5875;
-  font-size: 0.7rem;
-  line-height: 1.35;
-}
-
-.letter-control-status {
-  min-height: 1.2rem;
-  margin: 0;
-  color: #6f5875;
-  font-size: 0.74rem;
-}
-
-.letter-experience {
-  display: grid;
+@media (max-width: 699px) {
+  .letter-interaction-surface {
+    top: calc(50% + 4.3svh);
+    width: min(calc(100vw - 1.5rem), 41.1svh);
+  }
 }
 
 .cake-controls {
@@ -1616,150 +1597,6 @@ h1 {
   font-weight: 800;
 }
 
-.letter-preview {
-  position: relative;
-  max-height: min(25rem, 44vh);
-  margin-top: 0.85rem;
-  padding: 1.25rem 1.25rem 0.75rem;
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid rgb(255 217 138 / 48%);
-  background:
-    linear-gradient(90deg, transparent 2.25rem, rgb(255 158 207 / 12%) 2.25rem, rgb(255 158 207 / 12%) calc(2.25rem + 1px), transparent calc(2.25rem + 1px)),
-    repeating-linear-gradient(0deg, transparent 0, transparent 1.9rem, rgb(201 182 255 / 14%) 1.9rem, rgb(201 182 255 / 14%) calc(1.9rem + 1px)),
-    rgb(255 253 247 / 96%);
-  box-shadow: inset 0 0 2.5rem rgb(255 217 236 / 22%);
-  color: var(--ink);
-  font-family: var(--font-handwriting);
-  font-size: 1.35rem;
-  font-weight: 500;
-  line-height: 1.55;
-  opacity: 1;
-  transform: rotate(-0.35deg);
-  transform-origin: top center;
-  transition: max-height 420ms ease, margin 420ms ease, opacity 240ms ease, padding 420ms ease, transform 420ms ease;
-}
-
-.letter-preview[aria-hidden='true'] {
-  max-height: 0;
-  margin-top: 0;
-  padding-block: 0;
-  border-color: transparent;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-0.75rem) rotate(-0.35deg) scaleY(0.92);
-}
-
-.letter-preview-scroll {
-  max-height: min(20.5rem, 35vh);
-  padding: 0.15rem 0.5rem 1rem 1.55rem;
-  overflow-x: hidden;
-  overflow-y: auto;
-  color: #4f3656;
-  overscroll-behavior: contain;
-  scrollbar-color: rgb(207 93 142 / 45%) transparent;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
-}
-
-.letter-preview-scroll::-webkit-scrollbar {
-  width: 0.45rem;
-}
-
-.letter-preview-scroll::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgb(174 80 122 / 48%);
-}
-
-.letter-preview-scroll:focus-visible {
-  border-radius: 0.5rem;
-  outline: 2px solid var(--pink-strong);
-  outline-offset: 2px;
-}
-
-.letter-preview p {
-  margin: 0 0 0.7rem;
-}
-
-.letter-preview .letter-salutation {
-  color: var(--pink-strong);
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.letter-preview[data-letter-reveal='writing'] .letter-salutation,
-.letter-preview[data-letter-reveal='writing'] .letter-handwriting-line,
-.letter-preview[data-letter-reveal='writing'] .letter-signature {
-  animation: letter-ink-reveal var(--letter-duration, 0.65s) steps(var(--letter-steps, 18), end) var(--letter-delay, 0s) both;
-  will-change: clip-path, opacity, transform;
-}
-
-.letter-preview[data-letter-reveal='writing'] .letter-salutation {
-  --letter-delay: 0.18s;
-  --letter-duration: 0.52s;
-  --letter-steps: 14;
-}
-
-.letter-preview[data-letter-reveal='writing'] .letter-signature {
-  --letter-duration: 0.8s;
-  --letter-steps: 20;
-}
-
-.letter-empty-copy {
-  color: var(--muted);
-  font-style: italic;
-}
-
-.letter-signature {
-  display: grid;
-  justify-items: end;
-  margin-top: 1.2rem;
-  color: var(--pink-strong);
-  line-height: 1.15;
-}
-
-.letter-signature strong {
-  font-size: 1.45rem;
-}
-
-.letter-placeholder-note {
-  margin: 0.55rem 0 0 !important;
-  padding-top: 0.55rem;
-  border-top: 1px dashed rgb(207 93 142 / 20%);
-  color: #725c78;
-  font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 500;
-  line-height: 1.35;
-  text-align: center;
-}
-
-.letter-experience[data-content-length='short'] .letter-preview-scroll {
-  max-height: 14rem;
-}
-
-.letter-experience[data-content-length='extended'] .letter-preview-scroll {
-  padding-right: 0.8rem;
-}
-
-@keyframes letter-ink-reveal {
-  0% {
-    clip-path: inset(0 100% 0 0);
-    opacity: 0.12;
-    transform: translateY(0.14em);
-  }
-  14% {
-    opacity: 1;
-  }
-  100% {
-    clip-path: inset(0 -0.15em 0 0);
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .gallery-preview {
   display: flex;
   align-items: center;
@@ -2411,79 +2248,6 @@ h1 {
 
 }
 
-@media (min-width: 1100px) and (max-height: 980px) {
-  .letter-story-section {
-    min-height: 100svh;
-    padding-block: 4.75rem 1.5rem;
-  }
-
-  .letter-copy-panel {
-    width: min(520px, 43vw);
-    padding: clamp(1.15rem, 2.35vh, 1.55rem);
-    border-radius: 1.6rem;
-  }
-
-  .letter-copy-panel .section-heading {
-    min-height: 1.5rem;
-  }
-
-  .letter-copy-panel .section-icon {
-    font-size: 1.45rem;
-  }
-
-  .letter-copy-panel .eyebrow {
-    margin-top: 0.55rem;
-    margin-bottom: 0.3rem;
-  }
-
-  .letter-copy-panel h1 {
-    font-size: clamp(2.15rem, 5vh, 3rem);
-    line-height: 0.94;
-  }
-
-  .letter-copy-panel .section-description {
-    margin-top: 0.55rem;
-    font-size: 0.88rem;
-    line-height: 1.4;
-  }
-
-  .letter-copy-panel .phase-note {
-    display: none;
-  }
-
-  .letter-controls {
-    gap: 0.3rem;
-    margin-top: 0.7rem;
-  }
-
-  .letter-toggle-button {
-    min-height: 3rem;
-    padding-block: 0.5rem;
-  }
-
-  .letter-control-status {
-    min-height: 1rem;
-  }
-
-  .letter-preview {
-    max-height: min(22.5rem, 41vh);
-    margin-top: 0.45rem;
-    padding: 0.85rem 0.9rem 0.55rem;
-  }
-
-  .letter-preview-scroll {
-    max-height: min(18.4rem, 32vh);
-    padding: 0.1rem 0.35rem 0.7rem 1.35rem;
-    font-size: 1.18rem;
-    line-height: 1.42;
-  }
-
-  .letter-placeholder-note {
-    margin-top: 0.4rem !important;
-    padding-top: 0.4rem;
-  }
-}
-
 @media (max-width: 700px) {
   .dev-nav {
     right: 0.75rem;
@@ -2513,36 +2277,6 @@ h1 {
     margin-right: 0;
     padding: 1.4rem;
     overflow: hidden;
-  }
-
-  .letter-story-section {
-    min-height: calc(100svh + 12rem);
-    place-items: start center;
-    padding: 6rem 0.8rem 19rem;
-  }
-
-  .letter-copy-panel {
-    width: calc(100vw - 1.6rem);
-    max-width: calc(100vw - 1.6rem);
-    min-width: 0;
-    margin-right: 0;
-    padding: 1.4rem;
-  }
-
-  .letter-preview {
-    max-height: min(28rem, 48vh);
-    padding-inline: 0.85rem;
-    font-size: 1.2rem;
-  }
-
-  .letter-preview-scroll {
-    max-height: min(23rem, 39vh);
-    padding-left: 1.1rem;
-  }
-
-  .letter-toggle-button {
-    width: 100%;
-    min-height: 3.25rem;
   }
 
   .hero-story-section {
@@ -2765,23 +2499,6 @@ h1 {
 
   .cake-reset-button {
     transition: none;
-  }
-
-  .letter-toggle-button {
-    transition: none;
-  }
-
-  .letter-preview {
-    transition: none;
-  }
-
-  .letter-preview[data-letter-reveal='writing'] .letter-salutation,
-  .letter-preview[data-letter-reveal='writing'] .letter-handwriting-line,
-  .letter-preview[data-letter-reveal='writing'] .letter-signature {
-    animation: none;
-    clip-path: none;
-    opacity: 1;
-    transform: none;
   }
 
   .hero-fallback-fairy {

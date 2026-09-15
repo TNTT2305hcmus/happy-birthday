@@ -487,7 +487,8 @@ không confetti/mascot phụ và mọi môi trường vẫn có cách tắt đ�
   - [x] `App` điều phối lifecycle hành trình; `SceneManager` giữ Cake update khi inactive và tạm hạ DPR trong lúc chuyển cảnh.
   - [x] Particle dùng cùng một resource, bay theo tọa độ world-space từ nguồn sáng → topper → đầu đũa phép.
   - [x] Đã có verify tĩnh và browser CDP cho thứ tự stage, active section, scroll, DPR phục hồi và lỗi runtime.
-  - [x] Kết quả Edge DPR 2: 37 FPS, scroll 870 → 0, đủ 3 stage, không có exception.- [ ] R5.5 Cho phép wheel/touch/keyboard hủy auto-scroll an toàn; khóa chống kích hoạt lặp và phục hồi focus/
+  - [x] Kết quả Edge DPR 2: 37 FPS, scroll 870 → 0, đủ 3 stage, không có exception.
+- [ ] R5.5 Cho phép wheel/touch/keyboard hủy auto-scroll an toàn; khóa chống kích hoạt lặp và phục hồi focus/
   scroll state sau khi hoàn thành hoặc hủy.
 - [ ] R5.6 Reduced motion dùng fade/teleport có chủ đích; WebGL fallback dùng DOM/CSS nhưng giữ đúng thứ tự
   input → topper → Hero.
@@ -499,15 +500,49 @@ ngắt chuyển động và không phát sinh section/mascot chồng lấn.
 
 #### Phase R6 — Letter rebuild: phong bì duy nhất và chữ trên giấy
 
-- [ ] R6.1 Bỏ card thông tin, nút hiển thị và preview thư bên cạnh; section chỉ còn phong bì làm tâm điểm.
-- [ ] R6.2 Tạo vùng tương tác vô hình nhưng semantic bám phong bì để click/tap/Enter/Space mở thư; không làm mất
+> Trạng thái triển khai: theo quyết định ngày 12/09/2026, R5.6–R5.8 được tạm hoãn và Gate R5 vẫn để mở;
+> R6.1–R6.2 đã hoàn tất độc lập. Việc chuyển phase không được xem là nghiệm thu các mục R5 còn pending.
+
+- [x] R6.1 Bỏ card thông tin, nút hiển thị và preview thư bên cạnh; section chỉ còn phong bì làm tâm điểm.
+  - [x] StorySection dùng shell Letter rỗng, giữ lifecycle/scene binding nhưng không còn card, heading, nút,
+    status hoặc preview DOM; data nội dung và event API được giữ lại cho R6.2–R6.7.
+  - [x] Xóa CSS UI Letter cũ và cân lại LetterScene về giữa khung nhìn desktop/tablet/mobile.
+  - [x] Verify Phase 4.1–4.5, R6.1, lint và production build đạt; Edge CDP 1470×956, 1470×850,
+    1440×900 reduced-motion và 390×844 đều không overflow, đúng một canvas và đạt 60–61 FPS.
+- [x] R6.2 Tạo vùng tương tác vô hình nhưng semantic bám phong bì để click/tap/Enter/Space mở thư; không làm mất
   accessibility khi bỏ UI nút nhìn thấy.
-- [ ] R6.3 Sắp lại graph/layer và mask/clip: khi đóng giấy nằm trong lòng phong bì, bị che bởi miệng và hai mép;
+  - [x] LetterInteractionSurface dùng button HTML thật, đồng bộ aria-expanded/aria-label với letterEvents và
+    chỉ enabled/tabbable khi Letter active với presence hoàn toàn.
+  - [x] Hit area responsive bám phép chiếu phong bì, căn theo 50vw để không lệch bởi scrollbar; trạng thái thường
+    trong suốt, có focus-visible ring và không phục hồi card/preview cũ.
+  - [x] Click/tap, Enter và Space phát đúng một toggle; chuyển sang section khác tự disabled và tabIndex=-1.
+  - [x] Verify Phase 4.1–4.5, R6.1/R6.2, lint và production build đạt; Edge CDP trên 1470×956, 1470×850,
+    1440×900 reduced-motion và 390×844 đạt 60–61 FPS, đúng một canvas và không overflow.
+- [x] R6.3 Sắp lại graph/layer và mask/clip: khi đóng giấy nằm trong lòng phong bì, bị che bởi miệng và hai mép;
   khi mở giấy trượt lên phía trên nắp đã lật mà không xuyên hoặc lộ sai cạnh.
-- [ ] R6.4 Làm chậm mapping scroll-progress của seal, flap và paper; scroll mở liên tục theo phần trăm, còn click
+  - [x] Tách scene graph thành back layer, paper layer, pocket occluder layer và flap layer có tên rõ; giấy là sibling
+    độc lập, nằm giữa thân sau và pocket/folds theo chiều sâu thật của WebGL.
+  - [x] Thu giấy vừa khoang phong bì ở pose đóng; nắp lật và dịch liên tục ra sau trước khi giấy bắt đầu đi lên,
+    không đổi render order đột ngột và không dùng opacity/background giả mask.
+  - [x] Verify R6.3 kiểm tra topology, bounding box pose đóng và thứ tự pose 0/25/50/75/100%; R6.1/R6.2,
+    lint và production build đạt.
+  - [x] Edge headless CDP 1470×956, 1470×850, 1440×900 reduced-motion và 390×844 giữ đúng một canvas,
+    không overflow/lỗi runtime, interaction không regress và đạt 60–61 FPS.
+- [x] R6.4 Làm chậm mapping scroll-progress của seal, flap và paper; scroll mở liên tục theo phần trăm, còn click
   chạy nhanh tới trạng thái mở hoàn toàn.
-- [ ] R6.5 Chọn và triển khai cơ chế đặt chữ trực tiếp trên bề mặt giấy (CanvasTexture hoặc DOM projection bám
-  giấy), giữ bản semantic riêng cho screen reader và nội dung từ config.
+  - [x] Scroll ánh xạ tuyến tính từ 4% đến 96% section; tại midpoint đạt đúng 50% và tại 80% chưa hoàn tất sớm.
+  - [x] Tách khoảng tiến độ seal, flap và paper; giữ trình tự seal nhả trước, flap lật đáng kể rồi giấy mới trượt lên.
+  - [x] Tách response control/scroll theo tỷ lệ 12/4; click hội tụ trên 94% sau 0,25 giây, scroll vẫn chậm và liên tục.
+  - [x] Scroll nhỏ không hủy control override; scroll có chủ đích bàn giao về mapping scroll bằng easing liên tục.
+  - [x] Verify R6.4, R6.1–R6.3, Phase 4.1–4.5, lint và production build đạt; bỏ browser/headless visual QA theo
+    yêu cầu người dùng để người dùng tự quan sát trực quan.
+- [x] R6.5 Chọn và triển khai cơ chế đặt chữ trực tiếp trên bề mặt giấy (CanvasTexture hoặc DOM projection bám
+  giấy), giữ bản semantic riêng cho screen reader và nội dung từ config. **Đã chọn CanvasTexture.**
+  - [x] Vẽ salutation, nội dung, sign-off và signature từ config lên texture gắn trực tiếp vào `paperGroup`.
+  - [x] Giữ bản semantic riêng liên kết với nút phong bì; không khôi phục card Letter nhìn thấy.
+  - [x] Chỉ hiện mesh chữ khi open progress đạt 100%, dispose đầy đủ và thêm verify R6.5.
+  - [x] Verify R6.5, R6.1–R6.4, Phase 4.1–4.5, lint, diff check và production build đạt; browser/headless
+    visual QA tiếp tục bỏ theo yêu cầu quan sát trực quan đã chốt ở R6.4.
 - [ ] R6.6 Chỉ bắt đầu typing khi open progress đạt 100%; đóng/mở lại có quy tắc restart rõ ràng, reduced motion
   hiển thị tức thì.
 - [ ] R6.7 Xử lý thư 1/10/20 câu bằng pagination, paper expansion hoặc vùng đọc phù hợp mà không đưa card phụ trở lại.
